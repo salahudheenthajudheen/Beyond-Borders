@@ -83,7 +83,7 @@ Each company entry includes:
 
 Beyond Borders is our open infrastructure for turning frontier technology into frontier opportunity.
 
-🌐 [thepurplemovement.org](https://thepurplemovement.org) · 💬 [Join the community](#) · 🐦 [Follow us](#)
+🌐 [purple-movement.com](https://purple-movement.com) · 💬 [Join the community](#) · 🐦 [Follow us](#)
 
 ---
 
