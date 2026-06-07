@@ -17,11 +17,9 @@ Projects range from reference implementations and open datasets to full prototyp
 
 ## Projects Index
 
-_No projects yet. Be the first to add one._
-
 | Project | Vertical | Status | Contributors |
 |---|---|---|---|
-| — | — | — | — |
+| [Netra Kernels](./netra-kernels.md): Model Packaging and Runtime for Netrasemi Silicon | Cross-vertical / Platform | Idea | [Amal Shehu](https://github.com/amalshehu) |
 
 ---
 
