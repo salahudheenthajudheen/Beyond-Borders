@@ -1,0 +1,487 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import ScoreRadial from '../../../../components/ScoreRadial.astro';
+import { getCompanies, getCompanyDetail } from '../../../../utils/content-loader';
+import { renderMarkdown } from '../../../../utils/markdown';
+
+export function getStaticPaths() {
+  const companies = getCompanies();
+  const paths: any[] = [];
+  for (const company of companies) {
+    const detail = getCompanyDetail(company.slug);
+    if (!detail) continue;
+    for (const uc of detail.usecases) {
+      for (const ps of uc.problems) {
+        paths.push({
+          params: { slug: company.slug, vertical: uc.vertical, ps: ps.slug },
+          props: { company, problem: ps, vertical: uc.vertical, usecases: detail.usecases }
+        });
+      }
+    }
+  }
+  return paths;
+}
+
+const { slug, vertical, ps } = Astro.params;
+const { company, problem, vertical: verticalName, usecases } = Astro.props;
+const htmlContent = renderMarkdown(problem.content);
+
+// Vertical emoji map
+const verticalEmojis: Record<string, string> = {
+  'agriculture-ai': '🌾',
+  'healthcare-ai': '🏥',
+  'smart-manufacturing-ai': '🏭',
+  'maritime-ai': '🚢',
+  'tourism-ai': '🏛️',
+  'disaster-management-ai': '🌊',
+  'robotics-ai': '🤖',
+  'smart-campus-ai': '🎓',
+  'civic-tech-ai': '🏛️',
+  'climate-tech-ai': '🌍',
+  'legal-tech-ai': '⚖️',
+};
+
+function formatVerticalName(v: string): string {
+  return v
+    .replace(/-ai$/, '')
+    .split('-')
+    .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ') + ' AI';
+}
+
+const verticalDisplay = formatVerticalName(verticalName);
+const verticalEmoji = verticalEmojis[verticalName] || '🔬';
+
+// Gather related use cases from the same vertical (excluding current)
+const relatedUsecases: { title: string; href: string; score: number }[] = [];
+const currentVerticalGroup = usecases.find((uc: any) => uc.vertical === verticalName);
+if (currentVerticalGroup) {
+  for (const p of currentVerticalGroup.problems) {
+    if (p.slug !== problem.slug) {
+      relatedUsecases.push({
+        title: p.title,
+        href: `/companies/${slug}/${verticalName}/${p.slug}`,
+        score: p.scores.overall,
+      });
+    }
+  }
+}
+
+// Extract section anchors from content for quick nav
+const sectionAnchors: { id: string; label: string }[] = [];
+const headingRegex = /^##\s+(.+)$/gm;
+let match;
+while ((match = headingRegex.exec(problem.content)) !== null) {
+  const label = match[1].replace(/\*\*/g, '').trim();
+  const id = label
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+  sectionAnchors.push({ id, label });
+}
+
+// Score data
+const scores = [
+  { label: 'Desirability', score: problem.scores.desirability },
+  { label: 'Feasibility', score: problem.scores.feasibility },
+  { label: 'Viability', score: problem.scores.viability },
+  { label: 'Overall', score: problem.scores.overall },
+];
+---
+
+<BaseLayout title={`${problem.title} — ${company.name}`} description={`${problem.title} use case from ${company.name}`}>
+  <!-- ── Breadcrumb ── -->
+  <section class="ps-hero">
+    <div class="container">
+      <nav class="ps-breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span class="ps-breadcrumb__sep">›</span>
+        <a href="/companies">Companies</a>
+        <span class="ps-breadcrumb__sep">›</span>
+        <a href={`/companies/${slug}`}>{company.name}</a>
+        <span class="ps-breadcrumb__sep">›</span>
+        <span class="ps-breadcrumb__current">{verticalDisplay}</span>
+        <span class="ps-breadcrumb__sep">›</span>
+        <span class="ps-breadcrumb__current">{problem.title.length > 40 ? problem.title.slice(0, 40) + '…' : problem.title}</span>
+      </nav>
+
+      <!-- ── Header ── -->
+      <div class="ps-header animate-fade-in-up">
+        <h1 class="ps-header__title">{problem.title}</h1>
+        <div class="ps-header__meta">
+          <span class="badge">{verticalEmoji} {verticalDisplay}</span>
+          <span class="badge badge--cyan">{company.name}</span>
+        </div>
+      </div>
+
+      <!-- ── Score Dashboard ── -->
+      <div class="score-dashboard glass-panel gradient-border animate-fade-in-up delay-1">
+        <h3 class="score-dashboard__heading">DVF Score Dashboard</h3>
+        <div class="score-dashboard__radials">
+          {scores.map(s => (
+            <ScoreRadial label={s.label} score={s.score} />
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Main Content + Sidebar ── -->
+  <section class="ps-body">
+    <div class="container">
+      <div class="ps-layout">
+        <!-- Content Column -->
+        <article class="ps-content glass-panel">
+          <div class="md-content" set:html={htmlContent} />
+        </article>
+
+        <!-- Sidebar -->
+        <aside class="ps-sidebar">
+          <!-- Quick Nav -->
+          {sectionAnchors.length > 0 && (
+            <div class="sidebar-card glass-panel">
+              <h4 class="sidebar-card__title">On This Page</h4>
+              <nav class="sidebar-nav">
+                {sectionAnchors.map(anchor => (
+                  <a href={`#${anchor.id}`} class="sidebar-nav__link">{anchor.label}</a>
+                ))}
+              </nav>
+            </div>
+          )}
+
+          <!-- Build This CTA -->
+          <div class="sidebar-card glass-panel sidebar-card--cta gradient-border">
+            <span class="sidebar-card__icon">🚀</span>
+            <h4 class="sidebar-card__title">Build This</h4>
+            <p class="sidebar-card__text">Turn this problem statement into a working project.</p>
+            <a href="/contribute" class="sidebar-card__btn">Start Building →</a>
+          </div>
+
+          <!-- Related Use Cases -->
+          {relatedUsecases.length > 0 && (
+            <div class="sidebar-card glass-panel">
+              <h4 class="sidebar-card__title">Related Use Cases</h4>
+              <div class="related-list">
+                {relatedUsecases.map(r => (
+                  <a href={r.href} class="related-item">
+                    <span class="related-item__title">{r.title}</span>
+                    <span class={`related-item__score ${r.score >= 8 ? 'related-item__score--high' : r.score >= 7 ? 'related-item__score--mid' : 'related-item__score--low'}`}>
+                      {r.score.toFixed(1)}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </aside>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ── Hero ── */
+  .ps-hero {
+    background: var(--gradient-hero);
+    padding: var(--sp-16) 0 var(--sp-10);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ps-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, hsla(270, 80%, 40%, 0.1), transparent);
+    pointer-events: none;
+  }
+
+  /* ── Breadcrumb ── */
+  .ps-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--sp-8);
+  }
+
+  .ps-breadcrumb a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .ps-breadcrumb a:hover {
+    color: var(--accent-purple);
+  }
+
+  .ps-breadcrumb__sep {
+    color: hsla(230, 15%, 45%, 0.6);
+    font-size: 0.75rem;
+  }
+
+  .ps-breadcrumb__current {
+    color: var(--text-secondary);
+    opacity: 0.7;
+  }
+
+  /* ── Header ── */
+  .ps-header {
+    margin-bottom: var(--sp-8);
+  }
+
+  .ps-header__title {
+    font-family: var(--font-heading);
+    font-size: var(--fs-4xl);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--text-primary), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--sp-4);
+    line-height: var(--lh-heading);
+  }
+
+  .ps-header__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+  }
+
+  /* ── Score Dashboard ── */
+  .score-dashboard {
+    padding: var(--sp-8);
+  }
+
+  .score-dashboard__heading {
+    font-family: var(--font-heading);
+    font-size: var(--fs-md);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--sp-6);
+    text-align: center;
+  }
+
+  .score-dashboard__radials {
+    display: flex;
+    justify-content: center;
+    gap: var(--sp-10);
+    flex-wrap: wrap;
+  }
+
+  /* ── Body Layout ── */
+  .ps-body {
+    padding: var(--sp-16) 0 var(--sp-20);
+  }
+
+  .ps-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--sp-8);
+    align-items: start;
+  }
+
+  /* ── Content ── */
+  .ps-content {
+    min-width: 0; /* prevent overflow */
+  }
+
+  /* ── Sidebar ── */
+  .ps-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-6);
+    position: sticky;
+    top: 160px;
+  }
+
+  .sidebar-card {
+    padding: var(--sp-6);
+  }
+
+  .sidebar-card__icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: var(--sp-3);
+  }
+
+  .sidebar-card__title {
+    font-family: var(--font-heading);
+    font-size: var(--fs-base);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--sp-3);
+  }
+
+  .sidebar-card__text {
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+    line-height: var(--lh-body);
+    margin-bottom: var(--sp-4);
+  }
+
+  .sidebar-card__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--gradient-accent);
+    padding: var(--sp-2) var(--sp-5);
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: transform var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out);
+  }
+
+  .sidebar-card__btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow-purple);
+    color: var(--text-primary);
+  }
+
+  .sidebar-card--cta {
+    text-align: center;
+    background: linear-gradient(135deg, hsla(270, 80%, 30%, 0.2), hsla(185, 50%, 25%, 0.15));
+  }
+
+  /* ── Sidebar Nav ── */
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+  }
+
+  .sidebar-nav__link {
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--radius-sm);
+    border-left: 2px solid transparent;
+    transition: all var(--duration-fast) var(--ease-out);
+    display: block;
+    line-height: 1.4;
+  }
+
+  .sidebar-nav__link:hover {
+    color: var(--text-primary);
+    background: hsla(230, 20%, 20%, 0.5);
+    border-left-color: var(--accent-purple);
+  }
+
+  /* ── Related Items ── */
+  .related-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .related-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    text-decoration: none;
+    padding: var(--sp-3);
+    border-radius: var(--radius-md);
+    transition: background var(--duration-fast) var(--ease-out);
+    border: 1px solid transparent;
+  }
+
+  .related-item:hover {
+    background: hsla(230, 20%, 20%, 0.5);
+    border-color: hsla(230, 20%, 30%, 0.3);
+  }
+
+  .related-item__title {
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    line-height: 1.35;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .related-item:hover .related-item__title {
+    color: var(--text-primary);
+  }
+
+  .related-item__score {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    padding: var(--sp-1) var(--sp-2);
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+  }
+
+  .related-item__score--high {
+    color: var(--accent-emerald);
+    background: hsla(155, 75%, 50%, 0.12);
+  }
+
+  .related-item__score--mid {
+    color: hsl(45, 85%, 55%);
+    background: hsla(45, 85%, 55%, 0.12);
+  }
+
+  .related-item__score--low {
+    color: hsl(25, 85%, 55%);
+    background: hsla(25, 85%, 55%, 0.12);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 1024px) {
+    .ps-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .ps-sidebar {
+      position: static;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .ps-hero {
+      padding: var(--sp-10) 0 var(--sp-8);
+    }
+
+    .ps-header__title {
+      font-size: var(--fs-2xl);
+    }
+
+    .ps-body {
+      padding: var(--sp-10) 0 var(--sp-12);
+    }
+
+    .score-dashboard__radials {
+      gap: var(--sp-6);
+    }
+
+    .ps-sidebar {
+      grid-template-columns: 1fr;
+    }
+
+    .glass-panel {
+      padding: var(--sp-6);
+    }
+  }
+</style>

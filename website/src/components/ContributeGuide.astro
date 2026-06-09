@@ -1,0 +1,198 @@
+---
+const steps = [
+  {
+    num: 1,
+    icon: '🍴',
+    title: 'Fork the Repository',
+    description: 'Head to the Beyond Borders GitHub repo and click "Fork" to create your own copy of the project.',
+  },
+  {
+    num: 2,
+    icon: '🌿',
+    title: 'Create a Branch',
+    description: 'Create a feature branch from main with a descriptive name like feature/add-company-xyz.',
+  },
+  {
+    num: 3,
+    icon: '📝',
+    title: 'Create Your Contribution',
+    description: 'Add your company, use case, or vertical data following the templates and structure guidelines.',
+  },
+  {
+    num: 4,
+    icon: '🚀',
+    title: 'Open a Pull Request',
+    description: 'Push your changes and open a PR. Our maintainers will review and merge your contribution.',
+  },
+];
+---
+
+<section class="contribute-guide">
+  <div class="contribute-guide__track">
+    {steps.map((step, i) => (
+      <div class="contribute-guide__step" data-animate>
+        {/* Connecting line (not on last step) */}
+        {i < steps.length - 1 && <div class="contribute-guide__line" />}
+
+        <div class="contribute-guide__number">
+          <span class="contribute-guide__num-text">{step.num}</span>
+        </div>
+
+        <div class="contribute-guide__card">
+          <span class="contribute-guide__icon">{step.icon}</span>
+          <h3 class="contribute-guide__title">{step.title}</h3>
+          <p class="contribute-guide__desc">{step.description}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<script>
+  function animateSteps() {
+    const steps = document.querySelectorAll('[data-animate]');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          (entry.target as HTMLElement).classList.add('contribute-guide__step--visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    steps.forEach(step => observer.observe(step));
+  }
+
+  animateSteps();
+  document.addEventListener('astro:after-swap', animateSteps);
+</script>
+
+<style>
+  .contribute-guide {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .contribute-guide__track {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .contribute-guide__step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    position: relative;
+    padding-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .contribute-guide__step--visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Stagger animation delay */
+  .contribute-guide__step:nth-child(1) { transition-delay: 0s; }
+  .contribute-guide__step:nth-child(2) { transition-delay: 0.15s; }
+  .contribute-guide__step:nth-child(3) { transition-delay: 0.3s; }
+  .contribute-guide__step:nth-child(4) { transition-delay: 0.45s; }
+
+  /* Connecting line */
+  .contribute-guide__line {
+    position: absolute;
+    left: 24px;
+    top: 50px;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+      180deg,
+      hsl(270, 80%, 65%),
+      hsl(285, 75%, 55%),
+      hsl(185, 85%, 55%)
+    );
+    opacity: 0.3;
+  }
+
+  /* Numbered circle */
+  .contribute-guide__number {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, hsl(270, 80%, 65%), hsl(285, 75%, 55%));
+    box-shadow: 0 4px 20px hsla(270, 80%, 50%, 0.3);
+    position: relative;
+    z-index: 2;
+  }
+
+  .contribute-guide__num-text {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: white;
+  }
+
+  /* Card */
+  .contribute-guide__card {
+    flex: 1;
+    background: hsla(230, 20%, 20%, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsla(230, 20%, 30%, 0.4);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .contribute-guide__icon {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .contribute-guide__title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: hsl(0, 0%, 95%);
+    margin: 0;
+  }
+
+  .contribute-guide__desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    color: hsl(230, 15%, 60%);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .contribute-guide__step {
+      gap: 1rem;
+    }
+
+    .contribute-guide__number {
+      width: 40px;
+      height: 40px;
+    }
+
+    .contribute-guide__line {
+      left: 20px;
+      top: 42px;
+    }
+
+    .contribute-guide__card {
+      padding: 1.25rem;
+    }
+  }
+</style>

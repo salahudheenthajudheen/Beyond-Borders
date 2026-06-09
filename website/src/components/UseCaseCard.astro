@@ -1,0 +1,136 @@
+---
+interface Props {
+  title: string;
+  href: string;
+  vertical: string;
+  overallScore: number;
+  excerpt?: string;
+}
+const { title, href, vertical, overallScore, excerpt } = Astro.props;
+
+// Determine score color tier
+const scoreClass = overallScore >= 8 ? 'green' : overallScore >= 7 ? 'yellow' : 'orange';
+---
+
+<a href={href} class="usecase-card">
+  <div class="usecase-card__header">
+    <span class="usecase-card__vertical">{vertical}</span>
+    <span class={`usecase-card__score usecase-card__score--${scoreClass}`}>
+      {overallScore.toFixed(1)}
+    </span>
+  </div>
+
+  <h3 class="usecase-card__title">{title}</h3>
+
+  {excerpt && (
+    <p class="usecase-card__excerpt">{excerpt}</p>
+  )}
+
+  <span class="usecase-card__arrow">→</span>
+</a>
+
+<style>
+  .usecase-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: inherit;
+    background: hsla(230, 20%, 20%, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsla(230, 20%, 30%, 0.4);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    position: relative;
+  }
+
+  .usecase-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px hsla(270, 80%, 40%, 0.15);
+    border-color: hsla(270, 80%, 65%, 0.3);
+  }
+
+  .usecase-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .usecase-card__vertical {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: hsl(285, 75%, 70%);
+    background: hsla(285, 75%, 55%, 0.12);
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid hsla(285, 75%, 55%, 0.2);
+  }
+
+  .usecase-card__score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.2rem 0.55rem;
+    border-radius: 8px;
+    min-width: 2.5rem;
+    text-align: center;
+  }
+
+  .usecase-card__score--green {
+    color: hsl(155, 75%, 55%);
+    background: hsla(155, 75%, 50%, 0.12);
+    border: 1px solid hsla(155, 75%, 50%, 0.25);
+  }
+
+  .usecase-card__score--yellow {
+    color: hsl(45, 85%, 55%);
+    background: hsla(45, 85%, 55%, 0.12);
+    border: 1px solid hsla(45, 85%, 55%, 0.2);
+  }
+
+  .usecase-card__score--orange {
+    color: hsl(25, 85%, 55%);
+    background: hsla(25, 85%, 55%, 0.12);
+    border: 1px solid hsla(25, 85%, 55%, 0.2);
+  }
+
+  .usecase-card__title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: hsl(0, 0%, 95%);
+    margin: 0;
+    line-height: 1.35;
+  }
+
+  .usecase-card__excerpt {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: hsl(230, 15%, 60%);
+    line-height: 1.6;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .usecase-card__arrow {
+    font-size: 1.1rem;
+    color: hsl(230, 15%, 45%);
+    transition: color 0.2s ease, transform 0.2s ease;
+    align-self: flex-end;
+    margin-top: auto;
+  }
+
+  .usecase-card:hover .usecase-card__arrow {
+    color: hsl(270, 80%, 75%);
+    transform: translateX(4px);
+  }
+</style>

@@ -1,0 +1,142 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import { getFrameworks } from '../../utils/content-loader';
+import { renderMarkdown } from '../../utils/markdown';
+
+const frameworks = getFrameworks();
+
+/* Map slugs to icons and short labels */
+const frameworkMeta: Record<string, { icon: string; label: string }> = {
+  'evaluation-framework': { icon: '📊', label: 'Evaluation' },
+  'startup-readiness-score': { icon: '🚀', label: 'Startup Readiness' },
+  'edge-ai-principles': { icon: '🧠', label: 'Edge AI Principles' },
+  'contribution-review-checklist': { icon: '✅', label: 'Review Checklist' },
+};
+
+/**
+ * Extract the first real paragraph from markdown content.
+ * Skips the H1 heading, blank lines, and front-matter-like lines.
+ */
+function extractFirstParagraph(md: string): string {
+  const lines = md.split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (
+      trimmed &&
+      !trimmed.startsWith('#') &&
+      !trimmed.startsWith('>') &&
+      !trimmed.startsWith('---') &&
+      !trimmed.startsWith('|')
+    ) {
+      return trimmed;
+    }
+  }
+  return '';
+}
+---
+
+<BaseLayout title="Frameworks & Principles" description="Structured tools for evaluating ideas, scoring startups, and maintaining quality">
+  <Hero title="Frameworks & Principles" subtitle="Structured tools for evaluating ideas, scoring startups, and maintaining quality" />
+
+  <section class="frameworks-hub section">
+    <div class="container">
+      <div class="frameworks-hub__grid">
+        {frameworks.map((fw) => {
+          const meta = frameworkMeta[fw.slug] || { icon: '📄', label: fw.title };
+          const desc = extractFirstParagraph(fw.content);
+          return (
+            <a href={`/frameworks/${fw.slug}/`} class="fw-card glass-card gradient-border">
+              <span class="fw-card__icon">{meta.icon}</span>
+              <div class="fw-card__badge">
+                <span class="badge">{meta.label}</span>
+              </div>
+              <h3 class="fw-card__title">{fw.title}</h3>
+              <p class="fw-card__desc">{desc}</p>
+              <span class="fw-card__link">
+                Read More <span class="fw-card__arrow">→</span>
+              </span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .frameworks-hub__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-8);
+  }
+
+  /* ── Card ──────────────────────────────────────────────────── */
+  .fw-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .fw-card__icon {
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+
+  .fw-card__badge {
+    display: flex;
+  }
+
+  .fw-card__title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: var(--fs-xl);
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .fw-card__desc {
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+    line-height: var(--lh-body);
+    margin: 0;
+    /* Clamp to 3 lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .fw-card__link {
+    margin-top: auto;
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--accent-purple);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    transition: gap var(--duration-normal) var(--ease-out);
+  }
+
+  .fw-card:hover .fw-card__link {
+    color: var(--accent-cyan);
+  }
+
+  .fw-card__arrow {
+    transition: transform var(--duration-normal) var(--ease-out);
+  }
+
+  .fw-card:hover .fw-card__arrow {
+    transform: translateX(4px);
+  }
+
+  /* ── Responsive ────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .frameworks-hub__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,244 @@
+---
+const pathname = Astro.url.pathname;
+
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/companies/', label: 'Companies' },
+  { href: '/verticals/', label: 'Verticals' },
+  { href: '/frameworks/', label: 'Frameworks' },
+  { href: '/resources/', label: 'Resources' },
+  { href: '/contribute/', label: 'Contribute' },
+];
+---
+
+<nav class="navbar" id="navbar">
+  <div class="navbar__inner">
+    <a href="/" class="navbar__brand">
+      <span class="navbar__logo">Beyond Borders</span>
+      <span class="navbar__subtitle">by The Purple Movement</span>
+    </a>
+
+    <button class="navbar__toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span class="navbar__toggle-bar"></span>
+      <span class="navbar__toggle-bar"></span>
+      <span class="navbar__toggle-bar"></span>
+    </button>
+
+    <ul class="navbar__links" id="nav-links">
+      {navLinks.map(({ href, label }) => {
+        const isActive = pathname === href || (href !== '/' && pathname.startsWith(href));
+        return (
+          <li>
+            <a href={href} class:list={['navbar__link', { 'navbar__link--active': isActive }]}>
+              {label}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</nav>
+
+<script>
+  // Mobile menu toggle
+  const toggle = document.getElementById('nav-toggle');
+  const navLinks = document.getElementById('nav-links');
+  const navbar = document.getElementById('navbar');
+
+  if (toggle && navLinks) {
+    toggle.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('navbar__links--open');
+      toggle.classList.toggle('navbar__toggle--active', isOpen);
+      toggle.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    // Close menu when clicking a link
+    navLinks.querySelectorAll('.navbar__link').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('navbar__links--open');
+        toggle.classList.remove('navbar__toggle--active');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  // Add shadow on scroll
+  if (navbar) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 20) {
+        navbar.classList.add('navbar--scrolled');
+      } else {
+        navbar.classList.remove('navbar--scrolled');
+      }
+    }, { passive: true });
+  }
+</script>
+
+<style>
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: hsla(230, 20%, 10%, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid hsla(270, 80%, 65%, 0.15);
+    transition: box-shadow 0.3s ease, background 0.3s ease;
+  }
+
+  .navbar--scrolled {
+    background: hsla(230, 20%, 8%, 0.92);
+    box-shadow:
+      0 4px 30px hsla(270, 80%, 40%, 0.1),
+      0 1px 0 hsla(270, 80%, 65%, 0.2);
+  }
+
+  .navbar__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+  }
+
+  .navbar__brand {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    gap: 0;
+  }
+
+  .navbar__logo {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  .navbar__subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: hsl(230, 15%, 65%);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .navbar__links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0.25rem;
+    align-items: center;
+  }
+
+  .navbar__link {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: hsl(230, 15%, 65%);
+    text-decoration: none;
+    padding: 0.5rem 0.85rem;
+    border-radius: 8px;
+    transition: color 0.2s ease, background 0.2s ease;
+    position: relative;
+  }
+
+  .navbar__link:hover {
+    color: hsl(0, 0%, 95%);
+    background: hsla(270, 80%, 65%, 0.1);
+  }
+
+  .navbar__link--active {
+    color: hsl(270, 80%, 75%);
+    background: hsla(270, 80%, 65%, 0.12);
+  }
+
+  .navbar__link--active::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 2px;
+    background: var(--text-primary);
+    border-radius: 2px;
+  }
+
+  /* Hamburger toggle */
+  .navbar__toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    z-index: 10;
+  }
+
+  .navbar__toggle-bar {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: hsl(0, 0%, 95%);
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .navbar__toggle--active .navbar__toggle-bar:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  .navbar__toggle--active .navbar__toggle-bar:nth-child(2) {
+    opacity: 0;
+  }
+  .navbar__toggle--active .navbar__toggle-bar:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .navbar__toggle {
+      display: flex;
+    }
+
+    .navbar__links {
+      position: fixed;
+      top: 72px;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      background: hsla(230, 20%, 8%, 0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 1.5rem;
+      gap: 0.5rem;
+      border-bottom: 1px solid hsla(270, 80%, 65%, 0.15);
+      max-height: calc(100dvh - 72px);
+      overflow-y: auto;
+      transform: translateY(-120%);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+
+    .navbar__links--open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .navbar__link {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+    }
+  }
+</style>

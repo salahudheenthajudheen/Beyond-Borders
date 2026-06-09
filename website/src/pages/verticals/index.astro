@@ -1,0 +1,384 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import VerticalCard from '../../components/VerticalCard.astro';
+import { getVerticals } from '../../utils/content-loader';
+
+const verticals = getVerticals();
+
+const verticalIcons: Record<string, string> = {
+  'agriculture-ai': '🌾',
+  'healthcare-ai': '🏥',
+  'smart-manufacturing-ai': '🏭',
+  'manufacturing-ai': '🏭',
+  'maritime-ai': '🚢',
+  'tourism-ai': '🏛️',
+  'disaster-management-ai': '🌊',
+  'robotics-ai': '🤖',
+  'smart-campus-ai': '🎓',
+};
+
+const totalUsecases = verticals.reduce((sum, v) => sum + v.usecaseCount, 0);
+---
+
+<BaseLayout title="Verticals" description="Explore technology verticals where frontier AI meets real-world impact across agriculture, healthcare, maritime, and more.">
+
+  <!-- ═══ Hero ═══ -->
+  <Hero
+    title="Technology Verticals"
+    subtitle="Where frontier technology creates real-world impact"
+  />
+
+  <!-- ═══ Section Divider ═══ -->
+  <div class="section-divider"></div>
+
+  <!-- ═══ Intro ═══ -->
+  <section class="section" id="intro">
+    <div class="container">
+      <div class="intro-card glass-card animate-fade-in-up">
+        <div class="intro-card__icon">🧭</div>
+        <h2 class="intro-card__title">What are Verticals?</h2>
+        <p class="intro-card__text">
+          Verticals are industry domains where frontier technology can create transformative impact. Each vertical maps problem statements from multiple companies — connecting AI, robotics, and deep tech to real challenges in agriculture, healthcare, manufacturing, maritime, and beyond.
+        </p>
+        <div class="intro-stats">
+          <div class="intro-stat">
+            <span class="intro-stat__value">{verticals.length}</span>
+            <span class="intro-stat__label">Verticals</span>
+          </div>
+          <div class="intro-stat__divider"></div>
+          <div class="intro-stat">
+            <span class="intro-stat__value">{totalUsecases}</span>
+            <span class="intro-stat__label">Use Cases</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Section Divider ═══ -->
+  <div class="section-divider"></div>
+
+  <!-- ═══ Verticals Grid ═══ -->
+  <section class="section" id="verticals-list">
+    <div class="container">
+      <h2 class="section-heading animate-fade-in-up">
+        Explore All Verticals
+      </h2>
+      <p class="section-subtitle animate-fade-in-up delay-1">
+        Click on a vertical to discover scored use cases and open project opportunities
+      </p>
+
+      <div class="verticals-grid">
+        {verticals.map((v, i) => (
+          <div class={`animate-fade-in-up delay-${Math.min(i + 1, 6)}`}>
+            <VerticalCard
+              slug={v.slug}
+              name={v.name}
+              usecaseCount={v.usecaseCount}
+              icon={verticalIcons[v.slug] || '🔬'}
+            />
+          </div>
+        ))}
+      </div>
+
+      {verticals.length === 0 && (
+        <div class="empty-state glass-card animate-fade-in-up">
+          <span class="empty-state__icon">🏗️</span>
+          <h3 class="empty-state__title">Verticals Coming Soon</h3>
+          <p class="empty-state__text">
+            We're actively building out vertical documentation. Check back soon or contribute on GitHub!
+          </p>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- ═══ Section Divider ═══ -->
+  <div class="section-divider"></div>
+
+  <!-- ═══ CTA ═══ -->
+  <section class="section" id="cta">
+    <div class="container">
+      <div class="cta-card glass-card animate-fade-in-up">
+        <h2 class="cta-card__title">Know a vertical we're missing?</h2>
+        <p class="cta-card__text">
+          Beyond Borders is open source. Propose a new vertical, add use cases, or start mapping a technology domain you're passionate about.
+        </p>
+        <div class="cta-card__actions">
+          <a
+            href="https://github.com/salahudheenthajudheen/Beyond-Borders/issues/new"
+            class="cta-btn cta-btn--primary"
+            target="_blank"
+            rel="noopener"
+          >
+            🚀 Propose a Vertical
+          </a>
+          <a href="/companies/" class="cta-btn cta-btn--outline">
+            Browse Companies →
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ── Section Heading Styles ── */
+  .section-heading {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    text-align: center;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  .section-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+    color: hsl(230, 15%, 60%);
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+  }
+
+  /* ── Section Divider ── */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsla(270, 80%, 65%, 0.2), hsla(185, 85%, 55%, 0.15), transparent);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* ── Intro Card ── */
+  .intro-card {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2.5rem 2rem;
+  }
+
+  .intro-card__icon {
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+
+  .intro-card__title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .intro-card__text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: hsl(230, 15%, 65%);
+    line-height: 1.75;
+    margin: 0;
+    max-width: 60ch;
+  }
+
+  .intro-stats {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 0.5rem;
+    padding: 1rem 2rem;
+    background: hsla(230, 20%, 15%, 0.5);
+    border-radius: 12px;
+    border: 1px solid hsla(230, 20%, 30%, 0.3);
+  }
+
+  .intro-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .intro-stat__value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+
+  .intro-stat__label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: hsl(230, 15%, 55%);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .intro-stat__divider {
+    width: 1px;
+    height: 2.5rem;
+    background: linear-gradient(180deg, transparent, hsla(270, 80%, 65%, 0.3), transparent);
+  }
+
+  /* ── Verticals Grid ── */
+  .verticals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.25rem;
+  }
+
+  /* ── Empty State ── */
+  .empty-state {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+  }
+
+  .empty-state__icon {
+    font-size: 3rem;
+    line-height: 1;
+  }
+
+  .empty-state__title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: hsl(0, 0%, 95%);
+    margin: 0;
+  }
+
+  .empty-state__text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: hsl(230, 15%, 60%);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── CTA Section ── */
+  .cta-card {
+    max-width: 650px;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 3rem 2.5rem;
+  }
+
+  .cta-card__title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    line-height: 1.2;
+    margin: 0 0 1rem;
+    color: var(--text-primary);
+  }
+
+  .cta-card__text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: hsl(230, 15%, 65%);
+    line-height: 1.7;
+    margin: 0;
+    max-width: 50ch;
+  }
+
+  .cta-card__actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cta-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.7rem 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cta-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .cta-btn--primary {
+    background: linear-gradient(135deg, hsl(270, 80%, 65%), hsl(285, 75%, 55%));
+    color: white;
+    box-shadow: 0 4px 20px hsla(270, 80%, 50%, 0.25);
+  }
+
+  .cta-btn--primary:hover {
+    box-shadow: 0 6px 30px hsla(270, 80%, 50%, 0.4);
+    color: white;
+  }
+
+  .cta-btn--outline {
+    background: transparent;
+    color: hsl(0, 0%, 95%);
+    border: 1px solid transparent;
+    background-image:
+      linear-gradient(hsl(230, 20%, 11%), hsl(230, 20%, 11%)),
+      linear-gradient(135deg, hsl(270, 80%, 65%), hsl(185, 85%, 55%));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
+
+  .cta-btn--outline:hover {
+    box-shadow: 0 4px 20px hsla(185, 85%, 55%, 0.2);
+    color: hsl(0, 0%, 95%);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .verticals-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .intro-card,
+    .cta-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .cta-card__actions {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cta-btn {
+      width: 100%;
+      max-width: 280px;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .verticals-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .intro-stats {
+      padding: 0.75rem 1.25rem;
+      gap: 1.25rem;
+    }
+  }
+</style>

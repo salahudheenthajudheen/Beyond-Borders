@@ -1,0 +1,422 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import ContributeGuide from '../components/ContributeGuide.astro';
+import { getTemplates, getContributing } from '../utils/content-loader';
+import { renderMarkdown } from '../utils/markdown';
+
+const templates = getTemplates();
+const contributingMd = getContributing();
+const contributingHtml = renderMarkdown(contributingMd);
+
+/* Render each template's content */
+const renderedTemplates = templates.map(t => ({
+  ...t,
+  html: renderMarkdown(t.content),
+}));
+
+/* Icon map for templates */
+const templateIcons: Record<string, string> = {
+  'usecase-template': '📋',
+  'company-template': '🏢',
+  'project-template': '🛠️',
+  'startup-template': '🚀',
+};
+
+/* Contribution types */
+const contributionTypes = [
+  { icon: '📋', title: 'Problem Statements', desc: 'Identify real-world challenges that need innovative solutions across industries.' },
+  { icon: '💡', title: 'Use Cases', desc: 'Document practical applications of emerging technologies with detailed analysis.' },
+  { icon: '🛠️', title: 'Project Ideas', desc: 'Propose concrete projects with clear objectives, tech stacks, and implementation plans.' },
+  { icon: '🚀', title: 'Startup Opportunities', desc: 'Outline viable startup concepts with market analysis and business models.' },
+  { icon: '🔬', title: 'Research Directions', desc: 'Suggest cutting-edge research areas and academic investigation paths.' },
+  { icon: '🏢', title: 'Company Profiles', desc: 'Add comprehensive profiles of companies innovating at the edge of technology.' },
+];
+---
+
+<BaseLayout title="Contribute" description="Pick a problem. Do the research. Submit the PR.">
+  <Hero title="Contribute" subtitle="Pick a problem. Do the research. Submit the PR." />
+
+  <!-- Step-by-step guide -->
+  <section class="contribute-section">
+    <div class="container">
+      <h2 class="contribute-section__heading">How to Contribute</h2>
+      <ContributeGuide />
+    </div>
+  </section>
+
+  <!-- What You Can Contribute -->
+  <section class="contribute-section contribute-section--alt">
+    <div class="container">
+      <h2 class="contribute-section__heading">What You Can Contribute</h2>
+      <div class="contribute-types">
+        {contributionTypes.map(ct => (
+          <div class="ct-card glass-card">
+            <span class="ct-card__icon">{ct.icon}</span>
+            <h3 class="ct-card__title">{ct.title}</h3>
+            <p class="ct-card__desc">{ct.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Templates -->
+  <section class="contribute-section">
+    <div class="container">
+      <h2 class="contribute-section__heading">Templates</h2>
+      <p class="contribute-section__sub">Use these templates as a starting point for your contributions.</p>
+
+      <div class="templates-list">
+        {renderedTemplates.map(tmpl => (
+          <div class="template-card glass-card">
+            <button
+              class="template-card__header"
+              data-template-toggle
+              aria-expanded="false"
+            >
+              <div class="template-card__info">
+                <span class="template-card__icon">{templateIcons[tmpl.slug] || '📄'}</span>
+                <h3 class="template-card__title">{tmpl.title}</h3>
+              </div>
+              <span class="template-card__toggle-label">
+                Preview Template
+                <svg class="template-card__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </span>
+            </button>
+            <div class="template-card__body" hidden>
+              <div class="md-content" set:html={tmpl.html} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Full Contributing Guide -->
+  <section class="contribute-section contribute-section--alt">
+    <div class="container">
+      <h2 class="contribute-section__heading">Full Contributing Guide</h2>
+      <div class="glass-card contributing-guide-card">
+        <div class="md-content" set:html={contributingHtml} />
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="contribute-cta">
+    <div class="container contribute-cta__inner">
+      <div class="contribute-cta__orb contribute-cta__orb--1"></div>
+      <div class="contribute-cta__orb contribute-cta__orb--2"></div>
+      <h2 class="contribute-cta__title">Ready to contribute?</h2>
+      <p class="contribute-cta__desc">Fork the repository, pick a template, and open your first pull request.</p>
+      <a
+        href="https://github.com/ThePurpleMovement/Beyond-Borders"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="contribute-cta__btn"
+      >
+        Fork the Repository on GitHub
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+          <polyline points="15 3 21 3 21 9" />
+          <line x1="10" y1="14" x2="21" y2="3" />
+        </svg>
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  function initTemplateToggles() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-template-toggle]');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const card = btn.closest('.template-card');
+        if (!card) return;
+
+        const body = card.querySelector('.template-card__body') as HTMLElement | null;
+        if (!body) return;
+
+        const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+
+        btn.setAttribute('aria-expanded', String(!isExpanded));
+
+        if (isExpanded) {
+          body.setAttribute('hidden', '');
+        } else {
+          body.removeAttribute('hidden');
+        }
+      });
+    });
+  }
+
+  initTemplateToggles();
+  document.addEventListener('astro:after-swap', initTemplateToggles);
+</script>
+
+<style>
+  /* ── Section Scaffolding ───────────────────────────────────── */
+  .contribute-section {
+    padding-block: var(--sp-16);
+  }
+
+  .contribute-section--alt {
+    background: var(--bg-secondary);
+  }
+
+  .contribute-section__heading {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: var(--fs-3xl);
+    text-align: center;
+    margin-bottom: var(--sp-4);
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .contribute-section__sub {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: var(--fs-base);
+    margin-bottom: var(--sp-10);
+    max-width: 600px;
+    margin-inline: auto;
+  }
+
+  /* ── Contribution Types Grid ───────────────────────────────── */
+  .contribute-types {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-6);
+  }
+
+  .ct-card {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .ct-card__icon {
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+
+  .ct-card__title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: var(--fs-lg);
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .ct-card__desc {
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+    line-height: var(--lh-body);
+    margin: 0;
+  }
+
+  /* ── Templates ─────────────────────────────────────────────── */
+  .templates-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .template-card {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .template-card:hover {
+    transform: none;
+  }
+
+  .template-card__header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sp-6) var(--sp-8);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out);
+  }
+
+  .template-card__header:hover {
+    background: hsla(230, 20%, 20%, 0.3);
+  }
+
+  .template-card__info {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+  }
+
+  .template-card__icon {
+    font-size: 1.8rem;
+    line-height: 1;
+  }
+
+  .template-card__title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: var(--fs-lg);
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .template-card__toggle-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--accent-purple);
+    white-space: nowrap;
+  }
+
+  .template-card__chevron {
+    transition: transform var(--duration-normal) var(--ease-out);
+  }
+
+  [aria-expanded="true"] .template-card__chevron {
+    transform: rotate(180deg);
+  }
+
+  .template-card__body {
+    padding: 0 var(--sp-8) var(--sp-8);
+    border-top: 1px solid var(--surface-glass-border);
+  }
+
+  .template-card__body[hidden] {
+    display: none;
+  }
+
+  /* ── Contributing Guide Card ───────────────────────────────── */
+  .contributing-guide-card {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .contributing-guide-card:hover {
+    transform: none;
+  }
+
+  /* ── CTA Section ───────────────────────────────────────────── */
+  .contribute-cta {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--sp-24);
+  }
+
+  .contribute-cta__inner {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .contribute-cta__orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: 1;
+    animation: float 8s ease-in-out infinite;
+  }
+
+  .contribute-cta__orb--1 {
+    width: 400px;
+    height: 400px;
+    background: hsla(270, 80%, 50%, 0.1);
+    top: -100px;
+    right: -100px;
+  }
+
+  .contribute-cta__orb--2 {
+    width: 300px;
+    height: 300px;
+    background: hsla(185, 85%, 55%, 0.08);
+    bottom: -80px;
+    left: -80px;
+    animation-delay: -4s;
+  }
+
+  .contribute-cta__title {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: var(--fs-4xl);
+    margin-bottom: var(--sp-4);
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-violet), var(--accent-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .contribute-cta__desc {
+    color: var(--text-secondary);
+    font-size: var(--fs-lg);
+    margin-bottom: var(--sp-8);
+    max-width: 500px;
+    margin-inline: auto;
+  }
+
+  .contribute-cta__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-3);
+    font-family: var(--font-body);
+    font-size: var(--fs-base);
+    font-weight: 600;
+    padding: var(--sp-4) var(--sp-8);
+    border-radius: var(--radius-lg);
+    color: white;
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-violet));
+    text-decoration: none;
+    box-shadow: 0 4px 24px hsla(270, 80%, 50%, 0.3);
+    transition:
+      transform var(--duration-normal) var(--ease-out),
+      box-shadow var(--duration-normal) var(--ease-out);
+  }
+
+  .contribute-cta__btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 36px hsla(270, 80%, 50%, 0.45);
+    color: white;
+  }
+
+  /* ── Responsive ────────────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .contribute-types {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .contribute-types {
+      grid-template-columns: 1fr;
+    }
+
+    .template-card__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--sp-3);
+      padding: var(--sp-5) var(--sp-6);
+    }
+
+    .template-card__body {
+      padding: 0 var(--sp-6) var(--sp-6);
+    }
+  }
+</style>

@@ -1,0 +1,539 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import CompanyCard from '../components/CompanyCard.astro';
+import VerticalCard from '../components/VerticalCard.astro';
+import StatsCounter from '../components/StatsCounter.astro';
+import { getCompanies, getVerticals } from '../utils/content-loader';
+
+const companies = getCompanies();
+const verticals = getVerticals();
+
+const totalUsecases = companies.reduce((sum, c) => sum + c.usecaseCount, 0);
+const totalProjects = companies.reduce((sum, c) => sum + c.projectCount, 0);
+
+const verticalIcons: Record<string, string> = {
+  'agriculture-ai': '🌾',
+  'healthcare-ai': '🏥',
+  'smart-manufacturing-ai': '🏭',
+  'manufacturing-ai': '🏭',
+  'maritime-ai': '🚢',
+  'tourism-ai': '🏛️',
+  'disaster-management-ai': '🌊',
+  'robotics-ai': '🤖',
+  'smart-campus-ai': '🎓',
+};
+
+const journeySteps = [
+  { emoji: '🔬', title: 'Technology', desc: 'Frontier tech from leading companies' },
+  { emoji: '🎯', title: 'Opportunity', desc: 'Real-world gaps waiting to be filled' },
+  { emoji: '💡', title: 'Use Case', desc: 'Validated problem statements with scores' },
+  { emoji: '🛠️', title: 'Project', desc: 'Open projects anyone can build' },
+  { emoji: '🧪', title: 'Prototype', desc: 'Working proof of concept' },
+  { emoji: '🚀', title: 'Startup', desc: 'Viable ventures ready to scale' },
+  { emoji: '🌍', title: 'Impact', desc: 'Measurable change in real lives' },
+];
+---
+
+<BaseLayout title="Home" description="Beyond Borders — Open innovation intelligence by The Purple Movement. Discover opportunities, build solutions, create impact.">
+
+  <!-- ═══ 1. Hero ═══ -->
+  <Hero
+    title="Discover Opportunities. Build Solutions. Create Impact."
+    subtitle="An open innovation intelligence repository mapping frontier technology to real-world problem statements — scored, structured, and ready to build."
+    showCta={true}
+  />
+
+  <!-- ═══ Section Divider ═══ -->
+  <div class="section-divider"></div>
+
+  <!-- ═══ 2. Innovation Journey ═══ -->
+  <section class="section" id="journey">
+    <div class="container">
+      <h2 class="section-heading animate-fade-in-up">
+        The Innovation Journey
+      </h2>
+      <p class="section-subtitle animate-fade-in-up delay-1">
+        From frontier technology to real-world impact — a clear path for builders
+      </p>
+
+      <div class="journey-track">
+        <div class="journey-line" aria-hidden="true"></div>
+        <div class="journey-scroll">
+          {journeySteps.map((step, i) => (
+            <div class={`journey-card animate-fade-in-up delay-${Math.min(i + 1, 6)}`}>
+              <span class="journey-card__icon">{step.emoji}</span>
+              <h3 class="journey-card__title">{step.title}</h3>
+              <p class="journey-card__desc">{step.desc}</p>
+              {i < journeySteps.length - 1 && (
+                <span class="journey-card__arrow" aria-hidden="true">→</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Section Divider ═══ -->
+  <div class="section-divider"></div>
+
+  <!-- ═══ 3. Stats Counter ═══ -->
+  <section class="section" id="stats">
+    <div class="container">
+      <div class="animate-fade-in-up">
+        <StatsCounter stats={[
+          { label: 'Companies', value: companies.length },
+          { label: 'Problem Statements', value: totalUsecases },
+          { label: 'Verticals', value: verticals.length },
+          { label: 'Open Projects', value: totalProjects },
+        ]} />
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Section Divider ═══ -->
+  <div class="section-divider"></div>
+
+  <!-- ═══ 4. Featured Companies ═══ -->
+  <section class="section" id="companies">
+    <div class="container">
+      <h2 class="section-heading animate-fade-in-up">
+        Frontier Companies
+      </h2>
+      <p class="section-subtitle animate-fade-in-up delay-1">
+        Handpicked companies whose technologies power the next wave of innovation
+      </p>
+
+      <div class="companies-grid">
+        {companies.map((company, i) => (
+          <div class={`animate-fade-in-up delay-${Math.min(i + 1, 6)}`}>
+            <CompanyCard
+              slug={company.slug}
+              name={company.name}
+              summary={company.summary}
+              usecaseCount={company.usecaseCount}
+              projectCount={company.projectCount}
+              verticals={company.verticals}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Section Divider ═══ -->
+  <div class="section-divider"></div>
+
+  <!-- ═══ 5. Verticals Grid ═══ -->
+  <section class="section" id="verticals">
+    <div class="container">
+      <h2 class="section-heading animate-fade-in-up">
+        Technology Verticals
+      </h2>
+      <p class="section-subtitle animate-fade-in-up delay-1">
+        Where frontier technology meets real-world impact
+      </p>
+
+      <div class="verticals-grid">
+        {verticals.map((v, i) => (
+          <div class={`animate-fade-in-up delay-${Math.min(i + 1, 6)}`}>
+            <VerticalCard
+              slug={v.slug}
+              name={v.name}
+              usecaseCount={v.usecaseCount}
+              icon={verticalIcons[v.slug] || '🔬'}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Section Divider ═══ -->
+  <div class="section-divider"></div>
+
+  <!-- ═══ 6. How It Works ═══ -->
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <h2 class="section-heading animate-fade-in-up">
+        How It Works
+      </h2>
+      <p class="section-subtitle animate-fade-in-up delay-1">
+        Three steps from curiosity to contribution
+      </p>
+
+      <div class="how-grid">
+        <div class="glass-card how-card animate-fade-in-up delay-1">
+          <span class="how-card__step">01</span>
+          <span class="how-card__icon">🔍</span>
+          <h3 class="how-card__title">Explore</h3>
+          <p class="how-card__desc">
+            Browse frontier companies and technology verticals. Discover where AI, robotics, and deep tech intersect with agriculture, healthcare, maritime, and more.
+          </p>
+        </div>
+
+        <div class="glass-card how-card animate-fade-in-up delay-2">
+          <span class="how-card__step">02</span>
+          <span class="how-card__icon">🎯</span>
+          <h3 class="how-card__title">Pick a Problem</h3>
+          <p class="how-card__desc">
+            Each use case is a scored problem statement with desirability, feasibility, and viability ratings. Find one that matches your skills and passion.
+          </p>
+        </div>
+
+        <div class="glass-card how-card animate-fade-in-up delay-3">
+          <span class="how-card__step">03</span>
+          <span class="how-card__icon">🚀</span>
+          <h3 class="how-card__title">Build & Submit</h3>
+          <p class="how-card__desc">
+            Create a project, prototype, or startup concept. Follow the templates, open a PR, and contribute to the world's open innovation intelligence.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Section Divider ═══ -->
+  <div class="section-divider"></div>
+
+  <!-- ═══ 7. About Section ═══ -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="about-card glass-card animate-fade-in-up">
+        <div class="about-card__badge">
+          <span class="badge">The Purple Movement</span>
+        </div>
+        <h2 class="about-card__title">Our Mission</h2>
+        <p class="about-card__text">
+          Beyond Borders is an open innovation intelligence repository by <strong>The Purple Movement</strong>. We believe that the world's biggest problems deserve the world's best solutions — and that those solutions should be accessible to everyone.
+        </p>
+        <p class="about-card__text">
+          We map frontier technologies from companies like Google DeepMind, Waymo, and Verily to real-world problem statements across verticals like agriculture, healthcare, maritime, and disaster management. Every use case is scored for desirability, feasibility, and viability — so builders can focus on what matters most.
+        </p>
+        <p class="about-card__text">
+          This isn't just a repository. It's a launchpad. Students, researchers, entrepreneurs, and developers can pick a problem, build a project, and create measurable impact — all through open collaboration.
+        </p>
+        <div class="about-card__cta">
+          <a href="https://github.com/salahudheenthajudheen/Beyond-Borders" class="about-link" target="_blank" rel="noopener">
+            ⭐ Star on GitHub
+          </a>
+          <a href="/contribute/" class="about-link about-link--outline">
+            📖 Read the Contributing Guide
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ── Section Heading Styles ── */
+  .section-heading {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    text-align: center;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  .section-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+    color: hsl(230, 15%, 60%);
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+  }
+
+  /* ── Section Divider ── */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsla(270, 80%, 65%, 0.2), hsla(185, 85%, 55%, 0.15), transparent);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* ── Innovation Journey ── */
+  .journey-track {
+    position: relative;
+    margin-top: 1rem;
+  }
+
+  .journey-line {
+    display: none;
+  }
+
+  .journey-scroll {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    padding: 1.5rem 0.5rem 1.5rem;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: hsla(270, 80%, 65%, 0.3) transparent;
+  }
+
+  .journey-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .journey-scroll::-webkit-scrollbar-thumb {
+    background: hsla(270, 80%, 65%, 0.3);
+    border-radius: 4px;
+  }
+
+  .journey-card {
+    position: relative;
+    flex: 0 0 auto;
+    width: 155px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 1.5rem 1rem;
+    background: hsla(230, 20%, 20%, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsla(230, 20%, 30%, 0.4);
+    border-radius: 16px;
+    scroll-snap-align: center;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    margin-right: 2.5rem;
+  }
+
+  .journey-card:last-child {
+    margin-right: 0;
+  }
+
+  .journey-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px hsla(270, 80%, 40%, 0.15);
+    border-color: hsla(270, 80%, 65%, 0.3);
+  }
+
+  .journey-card__icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .journey-card__title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: hsl(0, 0%, 95%);
+    margin: 0;
+  }
+
+  .journey-card__desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    color: hsl(230, 15%, 60%);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .journey-card__arrow {
+    position: absolute;
+    right: -1.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, hsl(270, 80%, 65%), hsl(185, 85%, 55%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    pointer-events: none;
+  }
+
+  /* ── Companies Grid ── */
+  .companies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* ── Verticals Grid ── */
+  .verticals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.25rem;
+  }
+
+  /* ── How It Works ── */
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .how-card {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .how-card__step {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: hsla(270, 80%, 65%, 0.4);
+    letter-spacing: 0.1em;
+  }
+
+  .how-card__icon {
+    font-size: 2.5rem;
+    line-height: 1;
+    margin-top: 0.5rem;
+  }
+
+  .how-card__title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: hsl(0, 0%, 95%);
+    margin: 0;
+  }
+
+  .how-card__desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    color: hsl(230, 15%, 60%);
+    line-height: 1.65;
+    margin: 0;
+    max-width: 30ch;
+  }
+
+  /* ── About Section ── */
+  .about-card {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 3rem 2.5rem;
+  }
+
+  .about-card__badge {
+    margin-bottom: 0.5rem;
+  }
+
+  .about-card__title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .about-card__text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: hsl(230, 15%, 65%);
+    line-height: 1.75;
+    margin: 0;
+    max-width: 65ch;
+  }
+
+  .about-card__cta {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .about-link {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    text-decoration: none;
+    transition: transform 0.2s ease;
+  }
+
+  .about-link:hover {
+    transform: translateY(-2px);
+    background: hsl(0, 0%, 80%);
+    color: var(--bg-primary);
+  }
+
+  .about-link--outline {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--surface-glass-border);
+  }
+
+  .about-link--outline:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 1024px) {
+    .how-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .companies-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .verticals-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .how-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .about-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .journey-card {
+      width: 135px;
+      padding: 1.2rem 0.75rem;
+      margin-right: 1.25rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .verticals-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .about-card__cta {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .about-link {
+      width: 100%;
+      max-width: 280px;
+      text-align: center;
+    }
+  }
+</style>

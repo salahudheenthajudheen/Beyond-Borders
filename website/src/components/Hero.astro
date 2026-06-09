@@ -1,0 +1,220 @@
+---
+interface Props {
+  title: string;
+  subtitle: string;
+  showCta?: boolean;
+}
+const { title, subtitle, showCta = false } = Astro.props;
+---
+
+<section class:list={['hero', { 'hero--full': showCta }]}>
+  <div class="hero__bg" style="display:none;"></div>
+  <div class="hero__grid-overlay" style="display:none;"></div>
+
+  <!-- Floating decorative orbs (hidden) -->
+  <div class="hero__orb hero__orb--1" style="display:none;"></div>
+  <div class="hero__orb hero__orb--2" style="display:none;"></div>
+  <div class="hero__orb hero__orb--3" style="display:none;"></div>
+
+  <div class="hero__content">
+    <h1 class="hero__title">{title}</h1>
+    <p class="hero__subtitle">{subtitle}</p>
+
+    {showCta && (
+      <div class="hero__cta">
+        <a href="/companies/" class="hero__btn hero__btn--primary">
+          Browse Companies
+        </a>
+        <a href="/contribute/" class="hero__btn hero__btn--outline">
+          Start Contributing
+        </a>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 45vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 4rem 1.5rem;
+  }
+
+  .hero--full {
+    min-height: 70vh;
+  }
+
+  /* Animated gradient background */
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, hsl(270, 80%, 20%), hsl(230, 25%, 7%), hsl(185, 50%, 15%));
+    background-size: 300% 300%;
+    animation: heroGradient 12s ease infinite;
+    z-index: 0;
+  }
+
+  @keyframes heroGradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Dot grid overlay */
+  .hero__grid-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.3;
+    background-image: radial-gradient(circle, hsla(270, 80%, 65%, 0.3) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Floating decorative orbs */
+  .hero__orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 1;
+    animation: heroFloat 8s ease-in-out infinite;
+  }
+
+  .hero__orb--1 {
+    width: 300px;
+    height: 300px;
+    background: hsla(270, 80%, 50%, 0.15);
+    top: -50px;
+    right: 10%;
+    animation-delay: 0s;
+  }
+
+  .hero__orb--2 {
+    width: 200px;
+    height: 200px;
+    background: hsla(185, 85%, 55%, 0.1);
+    bottom: -30px;
+    left: 15%;
+    animation-delay: -3s;
+  }
+
+  .hero__orb--3 {
+    width: 150px;
+    height: 150px;
+    background: hsla(285, 75%, 55%, 0.12);
+    top: 30%;
+    left: 5%;
+    animation-delay: -6s;
+  }
+
+  @keyframes heroFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.05); }
+  }
+
+  /* Content */
+  .hero__content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 800px;
+    animation: heroFadeIn 0.8s ease-out;
+  }
+
+  @keyframes heroFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hero__title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    line-height: 1.1;
+    margin: 0 0 1.25rem;
+    color: var(--text-primary);
+  }
+
+  .hero__subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    font-weight: 400;
+    color: hsl(230, 15%, 65%);
+    line-height: 1.6;
+    margin: 0 0 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero__cta {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hero__btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.8rem 2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .hero__btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .hero__btn--primary {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border: none;
+  }
+
+  .hero__btn--primary:hover {
+    background: hsl(0, 0%, 80%);
+  }
+
+  .hero__btn--outline {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--surface-glass-border);
+  }
+
+  .hero__btn--outline:hover {
+    background: var(--bg-secondary);
+  }
+
+  @media (max-width: 640px) {
+    .hero {
+      padding: 2.5rem 1rem;
+      min-height: auto;
+    }
+    .hero--full {
+      min-height: 55vh;
+    }
+
+    .hero__cta {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero__btn {
+      width: 100%;
+      max-width: 280px;
+      text-align: center;
+    }
+  }
+</style>

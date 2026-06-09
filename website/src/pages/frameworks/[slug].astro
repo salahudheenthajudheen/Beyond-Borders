@@ -1,0 +1,245 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getFrameworks } from '../../utils/content-loader';
+import { renderMarkdown } from '../../utils/markdown';
+
+export function getStaticPaths() {
+  const frameworks = getFrameworks();
+  return frameworks.map(f => ({ params: { slug: f.slug }, props: { framework: f } }));
+}
+
+const { framework } = Astro.props;
+const htmlContent = renderMarkdown(framework.content);
+
+/* All frameworks for sidebar links */
+const allFrameworks = getFrameworks();
+
+/* Icon map */
+const iconMap: Record<string, string> = {
+  'evaluation-framework': '📊',
+  'startup-readiness-score': '🚀',
+  'edge-ai-principles': '🧠',
+  'contribution-review-checklist': '✅',
+};
+---
+
+<BaseLayout title={framework.title} description={`${framework.title} — Beyond Borders Framework`}>
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb container" aria-label="Breadcrumb">
+    <ol class="breadcrumb__list">
+      <li class="breadcrumb__item"><a href="/">Home</a></li>
+      <li class="breadcrumb__sep" aria-hidden="true">/</li>
+      <li class="breadcrumb__item"><a href="/frameworks/">Frameworks</a></li>
+      <li class="breadcrumb__sep" aria-hidden="true">/</li>
+      <li class="breadcrumb__item breadcrumb__item--active" aria-current="page">{framework.title}</li>
+    </ol>
+  </nav>
+
+  <section class="fw-detail section">
+    <div class="container fw-detail__layout">
+      <!-- Main Content -->
+      <article class="fw-detail__main glass-card">
+        <div class="fw-detail__header">
+          <span class="fw-detail__icon">{iconMap[framework.slug] || '📄'}</span>
+          <h1 class="fw-detail__title">{framework.title}</h1>
+        </div>
+        <div class="md-content" set:html={htmlContent} />
+      </article>
+
+      <!-- Sidebar -->
+      <aside class="fw-detail__sidebar">
+        <div class="fw-sidebar glass-card">
+          <h4 class="fw-sidebar__heading">All Frameworks</h4>
+          <nav>
+            <ul class="fw-sidebar__list">
+              {allFrameworks.map(fw => (
+                <li>
+                  <a
+                    href={`/frameworks/${fw.slug}/`}
+                    class:list={['fw-sidebar__link', { 'fw-sidebar__link--active': fw.slug === framework.slug }]}
+                  >
+                    <span class="fw-sidebar__icon">{iconMap[fw.slug] || '📄'}</span>
+                    {fw.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+
+        <a href="/frameworks/" class="fw-sidebar__back">
+          ← Back to all frameworks
+        </a>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ── Breadcrumb ────────────────────────────────────────────── */
+  .breadcrumb {
+    padding-top: var(--sp-8);
+    padding-bottom: var(--sp-2);
+  }
+
+  .breadcrumb__list {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .breadcrumb__item a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .breadcrumb__item a:hover {
+    color: var(--accent-purple);
+  }
+
+  .breadcrumb__item--active {
+    color: var(--text-accent);
+    font-weight: 500;
+  }
+
+  .breadcrumb__sep {
+    color: hsla(230, 15%, 40%, 0.6);
+    user-select: none;
+  }
+
+  /* ── Layout ────────────────────────────────────────────────── */
+  .fw-detail__layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: var(--sp-8);
+    align-items: start;
+  }
+
+  /* ── Main Content ──────────────────────────────────────────── */
+  .fw-detail__main {
+    min-width: 0; /* prevent overflow from tables */
+  }
+
+  .fw-detail__header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-8);
+    padding-bottom: var(--sp-6);
+    border-bottom: 1px solid var(--surface-glass-border);
+  }
+
+  .fw-detail__icon {
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+
+  .fw-detail__title {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: var(--fs-3xl);
+    margin: 0;
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Sidebar ───────────────────────────────────────────────── */
+  .fw-detail__sidebar {
+    position: sticky;
+    top: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+  }
+
+  .fw-sidebar {
+    padding: var(--sp-6);
+  }
+
+  .fw-sidebar:hover {
+    transform: none;
+  }
+
+  .fw-sidebar__heading {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    margin: 0 0 var(--sp-4);
+  }
+
+  .fw-sidebar__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .fw-sidebar__link {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    border-radius: var(--radius-md);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition:
+      background var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+  }
+
+  .fw-sidebar__link:hover {
+    background: hsla(230, 20%, 20%, 0.5);
+    color: var(--text-primary);
+  }
+
+  .fw-sidebar__link--active {
+    background: hsla(270, 80%, 65%, 0.12);
+    color: var(--accent-purple);
+    font-weight: 600;
+  }
+
+  .fw-sidebar__icon {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .fw-sidebar__back {
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: var(--sp-2) 0;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .fw-sidebar__back:hover {
+    color: var(--accent-purple);
+  }
+
+  /* ── Responsive ────────────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .fw-detail__layout {
+      grid-template-columns: 1fr;
+    }
+
+    .fw-detail__sidebar {
+      position: static;
+      order: -1;
+    }
+  }
+</style>

@@ -1,0 +1,151 @@
+---
+interface Props {
+  stats: { label: string; value: number; suffix?: string }[];
+}
+const { stats } = Astro.props;
+---
+
+<div class="stats-counter">
+  {stats.map(({ label, value, suffix }) => (
+    <div class="stats-counter__item">
+      <span
+        class="stats-counter__value"
+        data-target={value}
+        data-suffix={suffix || ''}
+      >
+        0{suffix || ''}
+      </span>
+      <span class="stats-counter__label">{label}</span>
+    </div>
+  ))}
+</div>
+
+<script>
+  function initCounters() {
+    const counters = document.querySelectorAll<HTMLElement>('.stats-counter__value');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target as HTMLElement;
+          const target = parseInt(el.getAttribute('data-target') || '0', 10);
+          const suffix = el.getAttribute('data-suffix') || '';
+          animateCount(el, target, suffix);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    counters.forEach(counter => observer.observe(counter));
+  }
+
+  function animateCount(el: HTMLElement, target: number, suffix: string) {
+    const duration = 1800;
+    const startTime = performance.now();
+
+    function easeOutQuart(t: number): number {
+      return 1 - Math.pow(1 - t, 4);
+    }
+
+    function update(currentTime: number) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutQuart(progress);
+      const current = Math.round(easedProgress * target);
+
+      el.textContent = current.toLocaleString() + suffix;
+
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      }
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  initCounters();
+  document.addEventListener('astro:after-swap', initCounters);
+</script>
+
+<style>
+  .stats-counter {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0;
+    background: hsla(230, 20%, 20%, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsla(230, 20%, 30%, 0.4);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 100%;
+  }
+
+  .stats-counter__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    padding: 0.5rem 1rem;
+    position: relative;
+  }
+
+  /* Divider between items */
+  .stats-counter__item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 15%;
+    height: 70%;
+    width: 1px;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      hsla(270, 80%, 65%, 0.3),
+      transparent
+    );
+  }
+
+  .stats-counter__value {
+    font-family: var(--font-mono);
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+
+  .stats-counter__label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: hsl(230, 15%, 60%);
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .stats-counter {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem;
+    }
+
+    .stats-counter__item::after {
+      display: none;
+    }
+
+    .stats-counter__item {
+      padding: 0.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-counter {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+      padding: 1.25rem;
+    }
+  }
+</style>

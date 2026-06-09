@@ -1,0 +1,127 @@
+---
+interface Props {
+  label: string;
+  score: number;
+  maxScore?: number;
+}
+const { label, score, maxScore = 10 } = Astro.props;
+
+// SVG circle math
+const radius = 42;
+const circumference = 2 * Math.PI * radius;
+const pct = Math.min(score / maxScore, 1);
+const offset = circumference * (1 - pct);
+
+// Color based on score
+const scoreColor = score >= 8
+  ? 'hsl(155, 75%, 50%)'
+  : score >= 7
+    ? 'hsl(45, 85%, 55%)'
+    : 'hsl(25, 85%, 55%)';
+
+const glowColor = score >= 8
+  ? 'hsla(155, 75%, 50%, 0.3)'
+  : score >= 7
+    ? 'hsla(45, 85%, 55%, 0.2)'
+    : 'hsla(25, 85%, 55%, 0.2)';
+---
+
+<div class="score-radial">
+  <svg class="score-radial__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background circle -->
+    <circle
+      class="score-radial__bg"
+      cx="50"
+      cy="50"
+      r={radius}
+      fill="none"
+      stroke="hsla(230, 20%, 25%, 0.5)"
+      stroke-width="6"
+    />
+    <!-- Foreground circle (score) -->
+    <circle
+      class="score-radial__fg"
+      cx="50"
+      cy="50"
+      r={radius}
+      fill="none"
+      stroke={scoreColor}
+      stroke-width="6"
+      stroke-linecap="round"
+      stroke-dasharray={circumference}
+      stroke-dashoffset={circumference}
+      data-target-offset={offset}
+      transform="rotate(-90 50 50)"
+      style={`filter: drop-shadow(0 0 6px ${glowColor});`}
+    />
+    <!-- Score text -->
+    <text
+      class="score-radial__value"
+      x="50"
+      y="50"
+      text-anchor="middle"
+      dominant-baseline="central"
+      fill={scoreColor}
+    >
+      {score.toFixed(1)}
+    </text>
+  </svg>
+  <span class="score-radial__label">{label}</span>
+</div>
+
+<script>
+  // Animate circle stroke on page load
+  function animateRadials() {
+    const circles = document.querySelectorAll<SVGCircleElement>('.score-radial__fg');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const circle = entry.target as SVGCircleElement;
+          const targetOffset = circle.getAttribute('data-target-offset') || '0';
+          circle.style.strokeDashoffset = targetOffset;
+          observer.unobserve(circle);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    circles.forEach(circle => observer.observe(circle));
+  }
+
+  // Run on DOMContentLoaded and on view transitions
+  animateRadials();
+  document.addEventListener('astro:after-swap', animateRadials);
+</script>
+
+<style>
+  .score-radial {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100px;
+  }
+
+  .score-radial__svg {
+    width: 100px;
+    height: 100px;
+  }
+
+  .score-radial__fg {
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .score-radial__value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .score-radial__label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: hsl(230, 15%, 65%);
+    text-align: center;
+    line-height: 1.3;
+  }
+</style>

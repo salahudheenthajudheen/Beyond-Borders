@@ -1,0 +1,307 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import { getResources } from '../utils/content-loader';
+import { renderMarkdown } from '../utils/markdown';
+
+const resources = getResources();
+const glossaryHtml = renderMarkdown(resources.glossary);
+const readingHtml = renderMarkdown(resources.reading);
+---
+
+<BaseLayout title="Resources" description="Glossary, reading lists, datasets, and communities">
+  <Hero title="Resources" subtitle="Glossary, reading lists, datasets, and communities" />
+
+  <section class="resources section">
+    <div class="container">
+      <!-- Tab Navigation -->
+      <div class="resources__tabs" role="tablist" aria-label="Resource sections">
+        <button
+          class="resources__tab resources__tab--active"
+          role="tab"
+          aria-selected="true"
+          aria-controls="panel-glossary"
+          id="tab-glossary"
+          data-tab="glossary"
+        >
+          📖 Glossary
+        </button>
+        <button
+          class="resources__tab"
+          role="tab"
+          aria-selected="false"
+          aria-controls="panel-reading"
+          id="tab-reading"
+          data-tab="reading"
+        >
+          📚 Recommended Reading
+        </button>
+      </div>
+
+      <!-- Glossary Panel -->
+      <div
+        class="resources__panel resources__panel--active"
+        role="tabpanel"
+        id="panel-glossary"
+        aria-labelledby="tab-glossary"
+      >
+        <!-- Search Input -->
+        <div class="resources__search-wrapper">
+          <label for="glossary-search" class="sr-only">Search glossary terms</label>
+          <div class="resources__search-box">
+            <svg class="resources__search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              id="glossary-search"
+              class="resources__search"
+              placeholder="Search glossary terms…"
+              autocomplete="off"
+            />
+          </div>
+          <p class="resources__search-count" id="glossary-count"></p>
+        </div>
+
+        <div class="glass-card resources__content" id="glossary-content">
+          <div class="md-content" set:html={glossaryHtml} />
+        </div>
+      </div>
+
+      <!-- Reading Panel -->
+      <div
+        class="resources__panel"
+        role="tabpanel"
+        id="panel-reading"
+        aria-labelledby="tab-reading"
+        hidden
+      >
+        <div class="glass-card resources__content">
+          <div class="md-content" set:html={readingHtml} />
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  function initResourcesTabs() {
+    const tabs = document.querySelectorAll<HTMLButtonElement>('.resources__tab');
+    const panels = document.querySelectorAll<HTMLElement>('.resources__panel');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.tab;
+
+        // Update tabs
+        tabs.forEach(t => {
+          t.classList.remove('resources__tab--active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('resources__tab--active');
+        tab.setAttribute('aria-selected', 'true');
+
+        // Update panels
+        panels.forEach(p => {
+          if (p.id === `panel-${target}`) {
+            p.classList.add('resources__panel--active');
+            p.removeAttribute('hidden');
+          } else {
+            p.classList.remove('resources__panel--active');
+            p.setAttribute('hidden', '');
+          }
+        });
+      });
+    });
+  }
+
+  function initGlossarySearch() {
+    const input = document.getElementById('glossary-search') as HTMLInputElement | null;
+    const container = document.getElementById('glossary-content');
+    const countEl = document.getElementById('glossary-count');
+    if (!input || !container) return;
+
+    /* We filter by toggling visibility on each top-level child of md-content */
+    const mdContent = container.querySelector('.md-content');
+    if (!mdContent) return;
+
+    const items = Array.from(mdContent.children) as HTMLElement[];
+
+    input.addEventListener('input', () => {
+      const query = input.value.toLowerCase().trim();
+      let visible = 0;
+
+      if (!query) {
+        items.forEach(el => { el.style.display = ''; });
+        if (countEl) countEl.textContent = '';
+        return;
+      }
+
+      items.forEach(el => {
+        const text = (el.textContent || '').toLowerCase();
+        if (text.includes(query)) {
+          el.style.display = '';
+          visible++;
+        } else {
+          el.style.display = 'none';
+        }
+      });
+
+      if (countEl) {
+        countEl.textContent = `${visible} result${visible !== 1 ? 's' : ''} found`;
+      }
+    });
+  }
+
+  initResourcesTabs();
+  initGlossarySearch();
+  document.addEventListener('astro:after-swap', () => {
+    initResourcesTabs();
+    initGlossarySearch();
+  });
+</script>
+
+<style>
+  /* ── Screen-reader only ────────────────────────────────────── */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ── Tabs ──────────────────────────────────────────────────── */
+  .resources__tabs {
+    display: flex;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-8);
+    border-bottom: 1px solid var(--surface-glass-border);
+    padding-bottom: var(--sp-2);
+  }
+
+  .resources__tab {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--fs-base);
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    padding: var(--sp-3) var(--sp-6);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    cursor: pointer;
+    position: relative;
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      background var(--duration-fast) var(--ease-out);
+  }
+
+  .resources__tab:hover {
+    color: var(--text-primary);
+    background: hsla(230, 20%, 20%, 0.3);
+  }
+
+  .resources__tab--active {
+    color: var(--text-primary);
+    background: var(--surface-glass);
+  }
+
+  .resources__tab--active::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-accent);
+    border-radius: var(--radius-full);
+  }
+
+  /* ── Panels ────────────────────────────────────────────────── */
+  .resources__panel {
+    animation: fadeInUp 0.4s var(--ease-out) both;
+  }
+
+  .resources__content {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .resources__content:hover {
+    transform: none;
+  }
+
+  /* ── Search ────────────────────────────────────────────────── */
+  .resources__search-wrapper {
+    margin-bottom: var(--sp-6);
+  }
+
+  .resources__search-box {
+    position: relative;
+    max-width: 480px;
+  }
+
+  .resources__search-icon {
+    position: absolute;
+    left: var(--sp-4);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    pointer-events: none;
+  }
+
+  .resources__search {
+    width: 100%;
+    padding: var(--sp-3) var(--sp-4) var(--sp-3) calc(var(--sp-4) + 26px);
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    color: var(--text-primary);
+    background: var(--surface-glass);
+    border: var(--border-glass);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    outline: none;
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+  }
+
+  .resources__search::placeholder {
+    color: var(--text-secondary);
+  }
+
+  .resources__search:focus {
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 0 3px hsla(270, 80%, 65%, 0.15);
+  }
+
+  .resources__search-count {
+    font-size: var(--fs-xs);
+    color: var(--text-secondary);
+    margin-top: var(--sp-2);
+    min-height: 1.2em;
+  }
+
+  /* ── Responsive ────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .resources__tabs {
+      flex-direction: column;
+      border-bottom: none;
+      gap: var(--sp-1);
+    }
+
+    .resources__tab {
+      border-radius: var(--radius-md);
+      text-align: left;
+    }
+
+    .resources__tab--active::after {
+      display: none;
+    }
+  }
+</style>
