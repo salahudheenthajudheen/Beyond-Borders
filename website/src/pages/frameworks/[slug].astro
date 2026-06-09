@@ -27,9 +27,9 @@ const iconMap: Record<string, string> = {
   <!-- Breadcrumb -->
   <nav class="breadcrumb container" aria-label="Breadcrumb">
     <ol class="breadcrumb__list">
-      <li class="breadcrumb__item"><a href="/">Home</a></li>
+      <li class="breadcrumb__item"><a href={`${import.meta.env.BASE_URL}`}>Home</a></li>
       <li class="breadcrumb__sep" aria-hidden="true">/</li>
-      <li class="breadcrumb__item"><a href="/frameworks/">Frameworks</a></li>
+      <li class="breadcrumb__item"><a href={`${import.meta.env.BASE_URL}frameworks/`}>Frameworks</a></li>
       <li class="breadcrumb__sep" aria-hidden="true">/</li>
       <li class="breadcrumb__item breadcrumb__item--active" aria-current="page">{framework.title}</li>
     </ol>
@@ -67,7 +67,7 @@ const iconMap: Record<string, string> = {
           </nav>
         </div>
 
-        <a href="/frameworks/" class="fw-sidebar__back">
+        <a href={`${import.meta.env.BASE_URL}frameworks/`} class="fw-sidebar__back">
           ← Back to all frameworks
         </a>
       </aside>

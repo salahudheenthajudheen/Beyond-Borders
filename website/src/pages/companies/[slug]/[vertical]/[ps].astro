@@ -95,11 +95,11 @@ const scores = [
   <section class="ps-hero">
     <div class="container">
       <nav class="ps-breadcrumb" aria-label="Breadcrumb">
-        <a href="/">Home</a>
+        <a href={`${import.meta.env.BASE_URL}`}>Home</a>
         <span class="ps-breadcrumb__sep">›</span>
-        <a href="/companies">Companies</a>
+        <a href={`${import.meta.env.BASE_URL}companies/`}>Companies</a>
         <span class="ps-breadcrumb__sep">›</span>
-        <a href={`/companies/${slug}`}>{company.name}</a>
+        <a href={`${import.meta.env.BASE_URL}companies/${slug}`}>{company.name}</a>
         <span class="ps-breadcrumb__sep">›</span>
         <span class="ps-breadcrumb__current">{verticalDisplay}</span>
         <span class="ps-breadcrumb__sep">›</span>
@@ -155,7 +155,7 @@ const scores = [
             <span class="sidebar-card__icon">🚀</span>
             <h4 class="sidebar-card__title">Build This</h4>
             <p class="sidebar-card__text">Turn this problem statement into a working project.</p>
-            <a href="/contribute" class="sidebar-card__btn">Start Building →</a>
+            <a href={`${import.meta.env.BASE_URL}contribute/`} class="sidebar-card__btn">Start Building →</a>
           </div>
 
           <!-- Related Use Cases -->

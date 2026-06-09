@@ -66,9 +66,9 @@ const tabs = [
   <section class="company-hero">
     <div class="container">
       <div class="company-hero__breadcrumb">
-        <a href="/">Home</a>
+        <a href={`${import.meta.env.BASE_URL}`}>Home</a>
         <span class="company-hero__sep">/</span>
-        <a href="/companies">Companies</a>
+        <a href={`${import.meta.env.BASE_URL}companies/`}>Companies</a>
         <span class="company-hero__sep">/</span>
         <span>{company.name}</span>
       </div>
@@ -170,7 +170,7 @@ const tabs = [
             <span class="cta-card__icon">📋</span>
             <h3 class="cta-card__title">No use cases yet</h3>
             <p class="cta-card__text">Be the first to add a use case for this company.</p>
-            <a href="/contribute" class="cta-card__btn">Contribute →</a>
+            <a href={`${import.meta.env.BASE_URL}contribute/`} class="cta-card__btn">Contribute →</a>
           </div>
         </div>
       )}
@@ -220,7 +220,7 @@ const tabs = [
             <span class="cta-card__icon">🚀</span>
             <h3 class="cta-card__title">No projects yet. Be the first to contribute!</h3>
             <p class="cta-card__text">Build something amazing with this company's technology and problem statements.</p>
-            <a href="/contribute" class="cta-card__btn">Start a Project →</a>
+            <a href={`${import.meta.env.BASE_URL}contribute/`} class="cta-card__btn">Start a Project →</a>
           </div>
         </div>
       )}
@@ -245,7 +245,7 @@ const tabs = [
             <span class="cta-card__icon">📚</span>
             <h3 class="cta-card__title">Research content coming soon</h3>
             <p class="cta-card__text">Help us build the knowledge base for this company.</p>
-            <a href="/contribute" class="cta-card__btn">Contribute Research →</a>
+            <a href={`${import.meta.env.BASE_URL}contribute/`} class="cta-card__btn">Contribute Research →</a>
           </div>
         </div>
       )}

@@ -63,9 +63,9 @@ const emoji = verticalEmojis[vertical.slug] || '🔬';
   <section class="vertical-hero">
     <div class="container">
       <nav class="vertical-breadcrumb" aria-label="Breadcrumb">
-        <a href="/">Home</a>
+        <a href={`${import.meta.env.BASE_URL}`}>Home</a>
         <span class="vertical-breadcrumb__sep">›</span>
-        <a href="/verticals">Verticals</a>
+        <a href={`${import.meta.env.BASE_URL}verticals/`}>Verticals</a>
         <span class="vertical-breadcrumb__sep">›</span>
         <span>{vertical.name}</span>
       </nav>
@@ -124,7 +124,7 @@ const emoji = verticalEmojis[vertical.slug] || '🔬';
             <span class="cta-card__icon">📋</span>
             <h3 class="cta-card__title">No use cases yet</h3>
             <p class="cta-card__text">Be the first to contribute a use case for {vertical.name}.</p>
-            <a href="/contribute" class="cta-card__btn">Add a Use Case →</a>
+            <a href={`${import.meta.env.BASE_URL}contribute/`} class="cta-card__btn">Add a Use Case →</a>
           </div>
         </div>
       )}
@@ -142,7 +142,7 @@ const emoji = verticalEmojis[vertical.slug] || '🔬';
             <p class="cta-banner__text">Have an AI problem statement or project idea? Contribute to the Beyond Borders ecosystem.</p>
           </div>
         </div>
-        <a href="/contribute" class="cta-banner__btn">Contribute →</a>
+        <a href={`${import.meta.env.BASE_URL}contribute/`} class="cta-banner__btn">Contribute →</a>
       </div>
     </div>
   </section>
