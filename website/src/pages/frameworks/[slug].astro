@@ -55,7 +55,7 @@ const iconMap: Record<string, string> = {
               {allFrameworks.map(fw => (
                 <li>
                   <a
-                    href={`/frameworks/${fw.slug}/`}
+                    href={`${import.meta.env.BASE_URL}frameworks/${fw.slug}/`}
                     class:list={['fw-sidebar__link', { 'fw-sidebar__link--active': fw.slug === framework.slug }]}
                   >
                     <span class="fw-sidebar__icon">{iconMap[fw.slug] || '📄'}</span>

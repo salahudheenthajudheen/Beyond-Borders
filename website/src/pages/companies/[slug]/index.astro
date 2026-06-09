@@ -156,7 +156,7 @@ const tabs = [
               {uc.problems.map(ps => (
                 <UseCaseCard
                   title={ps.title}
-                  href={`/companies/${slug}/${uc.vertical}/${ps.slug}`}
+                  href={`${import.meta.env.BASE_URL}companies/${slug}/${uc.vertical}/${ps.slug}/`}
                   vertical={formatVerticalName(uc.vertical)}
                   overallScore={ps.scores.overall}
                 />
