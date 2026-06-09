@@ -1,19 +1,21 @@
 ---
 const pathname = Astro.url.pathname;
 
+const base = import.meta.env.BASE_URL;
+
 const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/companies/', label: 'Companies' },
-  { href: '/verticals/', label: 'Verticals' },
-  { href: '/frameworks/', label: 'Frameworks' },
-  { href: '/resources/', label: 'Resources' },
-  { href: '/contribute/', label: 'Contribute' },
+  { href: base, label: 'Home' },
+  { href: `${base}companies/`, label: 'Companies' },
+  { href: `${base}verticals/`, label: 'Verticals' },
+  { href: `${base}frameworks/`, label: 'Frameworks' },
+  { href: `${base}resources/`, label: 'Resources' },
+  { href: `${base}contribute/`, label: 'Contribute' },
 ];
 ---
 
 <nav class="navbar" id="navbar">
   <div class="navbar__inner">
-    <a href="/" class="navbar__brand">
+    <a href={base} class="navbar__brand">
       <span class="navbar__logo">Beyond Borders</span>
       <span class="navbar__subtitle">by The Purple Movement</span>
     </a>
@@ -26,7 +28,7 @@ const navLinks = [
 
     <ul class="navbar__links" id="nav-links">
       {navLinks.map(({ href, label }) => {
-        const isActive = pathname === href || (href !== '/' && pathname.startsWith(href));
+        const isActive = pathname === href || (href !== base && pathname.startsWith(href));
         return (
           <li>
             <a href={href} class:list={['navbar__link', { 'navbar__link--active': isActive }]}>
