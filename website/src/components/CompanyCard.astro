@@ -11,7 +11,7 @@ const { slug, name, summary, usecaseCount, projectCount, verticals } = Astro.pro
 const base = import.meta.env.BASE_URL;
 ---
 
-<a href={`${base}companies/${slug}/`} class="company-card">
+<a href={`${base}/companies/${slug}/`} class="company-card">
   <div class="company-card__accent"></div>
   <div class="company-card__body">
     <h3 class="company-card__name">{name}</h3>
