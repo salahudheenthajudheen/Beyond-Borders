@@ -30,7 +30,7 @@ for (const company of companies) {
       for (const ps of uc.problems) {
         relatedUsecases.push({
           title: ps.title,
-          href: `/companies/${company.slug}/${uc.vertical}/${ps.slug}`,
+          href: `${import.meta.env.BASE_URL}companies/${company.slug}/${uc.vertical}/${ps.slug}/`,
           vertical: uc.vertical,
           overallScore: ps.scores.overall,
           company: company.name,
@@ -63,7 +63,7 @@ const emoji = verticalEmojis[vertical.slug] || '🔬';
   <section class="vertical-hero">
     <div class="container">
       <nav class="vertical-breadcrumb" aria-label="Breadcrumb">
-        <a href={`${import.meta.env.BASE_URL}`}>Home</a>
+        <a href={`${import.meta.env.BASE_URL}/`}>Home</a>
         <span class="vertical-breadcrumb__sep">›</span>
         <a href={`${import.meta.env.BASE_URL}verticals/`}>Verticals</a>
         <span class="vertical-breadcrumb__sep">›</span>

@@ -4,7 +4,7 @@ const pathname = Astro.url.pathname;
 const base = import.meta.env.BASE_URL;
 
 const navLinks = [
-  { href: base, label: 'Home' },
+  { href: `${base}/`, label: 'Home' },
   { href: `${base}/companies/`, label: 'Companies' },
   { href: `${base}/verticals/`, label: 'Verticals' },
   { href: `${base}/frameworks/`, label: 'Frameworks' },
@@ -15,7 +15,7 @@ const navLinks = [
 
 <nav class="navbar" id="navbar">
   <div class="navbar__inner">
-    <a href={base} class="navbar__brand">
+    <a href={`${base}/`} class="navbar__brand">
       <span class="navbar__logo">Beyond Borders</span>
       <span class="navbar__subtitle">by The Purple Movement</span>
     </a>

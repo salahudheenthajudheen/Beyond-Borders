@@ -60,7 +60,7 @@ if (currentVerticalGroup) {
     if (p.slug !== problem.slug) {
       relatedUsecases.push({
         title: p.title,
-        href: `/companies/${slug}/${verticalName}/${p.slug}`,
+        href: `${import.meta.env.BASE_URL}companies/${slug}/${verticalName}/${p.slug}/`,
         score: p.scores.overall,
       });
     }
@@ -95,11 +95,11 @@ const scores = [
   <section class="ps-hero">
     <div class="container">
       <nav class="ps-breadcrumb" aria-label="Breadcrumb">
-        <a href={`${import.meta.env.BASE_URL}`}>Home</a>
+        <a href={`${import.meta.env.BASE_URL}/`}>Home</a>
         <span class="ps-breadcrumb__sep">›</span>
         <a href={`${import.meta.env.BASE_URL}companies/`}>Companies</a>
         <span class="ps-breadcrumb__sep">›</span>
-        <a href={`${import.meta.env.BASE_URL}companies/${slug}`}>{company.name}</a>
+        <a href={`${import.meta.env.BASE_URL}companies/${slug}/`}>{company.name}</a>
         <span class="ps-breadcrumb__sep">›</span>
         <span class="ps-breadcrumb__current">{verticalDisplay}</span>
         <span class="ps-breadcrumb__sep">›</span>

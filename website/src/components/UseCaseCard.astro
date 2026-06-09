@@ -1,4 +1,6 @@
 ---
+import ScoreRadial from './ScoreRadial.astro';
+
 interface Props {
   title: string;
   href: string;
@@ -7,13 +9,12 @@ interface Props {
   excerpt?: string;
 }
 const { title, href, vertical, overallScore, excerpt } = Astro.props;
-const base = import.meta.env.BASE_URL;
 
 // Determine score color tier
 const scoreClass = overallScore >= 8 ? 'green' : overallScore >= 7 ? 'yellow' : 'orange';
 ---
 
-<a href={`${base}${href.startsWith('/') ? href.slice(1) : href}`} class="usecase-card">
+<a href={href} class="usecase-card">
   <div class="usecase-card__header">
     <span class="usecase-card__vertical">{vertical}</span>
     <span class={`usecase-card__score usecase-card__score--${scoreClass}`}>
