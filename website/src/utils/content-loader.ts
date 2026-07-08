@@ -502,3 +502,74 @@ export function getTemplates(): TemplateEntry[] {
 export function getContributing(): string {
   return safeRead(path.join(REPO_ROOT, 'CONTRIBUTING.md'));
 }
+
+// ── Search Index ───────────────────────────────────────────
+
+export interface SearchItem {
+  type: 'Company' | 'Vertical' | 'Framework' | 'Problem Statement';
+  title: string;
+  description: string;
+  url: string;
+}
+
+/**
+ * Build a flat search index across all content types.
+ */
+export function getSearchIndex(): SearchItem[] {
+  const index: SearchItem[] = [];
+  const base = import.meta.env.BASE_URL ?? '';
+
+  // Companies
+  const companies = getCompanies();
+  for (const c of companies) {
+    index.push({
+      type: 'Company',
+      title: c.name,
+      description: c.summary || c.overview.slice(0, 160) || '',
+      url: `${base}/companies/${c.slug}/`,
+    });
+  }
+
+  // Verticals
+  const verticals = getVerticals();
+  for (const v of verticals) {
+    const desc = v.content.replace(/^#\s+.+/m, '').trim().slice(0, 160) || '';
+    index.push({
+      type: 'Vertical',
+      title: v.name,
+      description: desc,
+      url: `${base}/verticals/${v.slug}/`,
+    });
+  }
+
+  // Frameworks
+  const frameworks = getFrameworks();
+  for (const f of frameworks) {
+    const desc = f.content.replace(/^#\s+.+/m, '').trim().slice(0, 160) || '';
+    index.push({
+      type: 'Framework',
+      title: f.title,
+      description: desc,
+      url: `${base}/frameworks/${f.slug}/`,
+    });
+  }
+
+  // Problem Statements (from all companies)
+  for (const c of companies) {
+    const detail = getCompanyDetail(c.slug);
+    if (!detail) continue;
+    for (const uc of detail.usecases) {
+      for (const ps of uc.problems) {
+        const desc = ps.content.replace(/^#\s+.+/m, '').trim().slice(0, 160) || '';
+        index.push({
+          type: 'Problem Statement',
+          title: ps.title,
+          description: desc,
+          url: `${base}/companies/${c.slug}/${uc.vertical}/${ps.slug}/`,
+        });
+      }
+    }
+  }
+
+  return index;
+}

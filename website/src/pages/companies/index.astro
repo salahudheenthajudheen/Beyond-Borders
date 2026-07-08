@@ -1,90 +1,95 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Hero from '../../components/Hero.astro';
-import CompanyCard from '../../components/CompanyCard.astro';
-import { getCompanies } from '../../utils/content-loader';
+import { getCompanies, getCompanyDetail } from '../../utils/content-loader';
 
 const companies = getCompanies();
+const base = import.meta.env.BASE_URL;
 
-const comingSoon = [
-  { name: 'OpenAI', slug: 'openai' },
-  { name: 'NVIDIA', slug: 'nvidia' },
-  { name: 'DeepMind', slug: 'deepmind' },
-  { name: 'SpaceX', slug: 'spacex' },
-  { name: 'Tesla', slug: 'tesla' },
-  { name: 'Beckn / ONDC', slug: 'beckn-ondc' },
-];
+const companyDetails = companies.map(c => ({ company: c, detail: getCompanyDetail(c.slug) }));
+const totalUsecases = companies.reduce((sum, c) => sum + c.usecaseCount, 0);
 ---
 
-<BaseLayout title="Companies" description="Explore frontier companies whose technologies power the next wave of innovation.">
+<BaseLayout title="Companies" description="Explore frontier companies and their problem statements.">
 
-  <!-- ═══ Hero ═══ -->
-  <Hero
-    title="Frontier Companies"
-    subtitle="Handpicked companies building the future with AI, robotics, and deep technology — mapped to real-world opportunities."
-  />
-
-  <!-- ═══ Section Divider ═══ -->
-  <div class="section-divider"></div>
-
-  <!-- ═══ Active Companies ═══ -->
-  <section class="section" id="active-companies">
+  <section class="hero-section">
+    <div class="hero-orb" aria-hidden="true"></div>
     <div class="container">
-      <h2 class="section-heading animate-fade-in-up">
-        Active Companies
-      </h2>
-      <p class="section-subtitle animate-fade-in-up delay-1">
-        Browse use cases, projects, and research for each company
-      </p>
-
-      <div class="companies-grid">
-        {companies.map((company, i) => (
-          <div class={`animate-fade-in-up delay-${Math.min(i + 1, 6)}`}>
-            <CompanyCard
-              slug={company.slug}
-              name={company.name}
-              summary={company.summary}
-              usecaseCount={company.usecaseCount}
-              projectCount={company.projectCount}
-              verticals={company.verticals}
-            />
-          </div>
-        ))}
+      <div class="hero-content">
+        <div class="hero-badge">Frontier Companies</div>
+        <h1 class="hero-title">Companies</h1>
+        <p class="hero-subtitle">Browse the onboarded companies and go straight to the problem statements they have published.</p>
+        <div class="hero-stats">
+          <span class="hero-stat">{companies.length} Companies</span>
+          <span class="hero-stat-dot">·</span>
+          <span class="hero-stat">{totalUsecases} Problem Statements</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ Section Divider ═══ -->
   <div class="section-divider"></div>
 
-  <!-- ═══ Coming Soon ═══ -->
-  <section class="section" id="coming-soon">
+  <section class="section">
     <div class="container">
-      <h2 class="section-heading animate-fade-in-up">
-        Coming Soon
-      </h2>
-      <p class="section-subtitle animate-fade-in-up delay-1">
-        These companies are next on our roadmap — want to help? Open a PR!
-      </p>
+      <div class="company-flow glass-card">
+        <div class="company-flow__step">
+          <span class="company-flow__index">01</span>
+          <p class="company-flow__text">See which companies are onboarded.</p>
+        </div>
+        <div class="company-flow__step">
+          <span class="company-flow__index">02</span>
+          <p class="company-flow__text">Open a company profile for context and overview.</p>
+        </div>
+        <div class="company-flow__step">
+          <span class="company-flow__index">03</span>
+          <p class="company-flow__text">Jump into the full list of available problem statements.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      <div class="coming-grid">
-        {comingSoon.map((company, i) => (
-          <div class={`coming-card glass-card animate-fade-in-up delay-${Math.min(i + 1, 6)}`}>
-            <div class="coming-card__badge">
-              <span class="badge coming-badge">Coming Soon</span>
+  <section class="section">
+    <div class="container">
+      <div class="section-intro">
+        <h2 class="section-intro__title">Onboarded Companies</h2>
+        <p class="section-intro__text">Each company card includes a direct path to its available problem statements.</p>
+      </div>
+      <div class="company-list">
+        {companyDetails.map(({ company, detail }) => (
+          <div class="company-block glass-card">
+            <div class="company-block__header">
+              <div class="company-block__top">
+                <h2 class="company-block__name">{company.name}</h2>
+                <a href={`${base}/companies/${company.slug}/`} class="company-block__readmore">
+                  Full profile →
+                </a>
+              </div>
+              <p class="company-block__summary">{company.summary}</p>
             </div>
-            <h3 class="coming-card__name">{company.name}</h3>
-            <p class="coming-card__hint">
-              Help us map this company's technology to real-world use cases.
-            </p>
-            <a
-              href="https://github.com/salahudheenthajudheen/Beyond-Borders/issues"
-              class="coming-card__link"
-              target="_blank"
-              rel="noopener"
-            >
-              Contribute →
-            </a>
+
+            {detail && detail.usecases.length > 0 && (
+              <div class="company-block__problems">
+                <div class="company-block__label-row">
+                  <span class="company-block__label-icon">💡</span>
+                  <h3 class="company-block__label">Problem Statements</h3>
+                </div>
+                <div class="problem-list">
+                  {detail.usecases.map(uc => (
+                    uc.problems.map(ps => (
+                      <a href={`${base}/companies/${company.slug}/${uc.vertical}/${ps.slug}/`} class="problem-link">
+                        <span class="problem-link__title">{ps.title}</span>
+                        <span class="problem-link__meta">
+                          <span class="problem-link__vertical">{uc.vertical.replace(/-/g, ' ')}</span>
+                          {ps.scores.overall > 0 && (
+                            <span class="problem-link__score">{ps.scores.overall.toFixed(1)}</span>
+                          )}
+                        </span>
+                      </a>
+                    ))
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -94,28 +99,77 @@ const comingSoon = [
 </BaseLayout>
 
 <style>
-  /* ── Section Heading Styles ── */
-  .section-heading {
-    font-family: 'Outfit', sans-serif;
-    font-weight: 800;
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    text-align: center;
-    margin-bottom: 0.75rem;
-    color: var(--text-primary);
-    line-height: 1.2;
+  .hero-section {
+    position: relative;
+    padding: 4rem 0 2rem;
+    overflow: hidden;
   }
 
-  .section-subtitle {
+  .hero-orb {
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, hsla(270, 80%, 50%, 0.12), transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: hsl(270, 80%, 70%);
+    background: hsla(270, 80%, 65%, 0.1);
+    border: 1px solid hsla(270, 80%, 65%, 0.2);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    margin: 0 0 0.75rem;
+    background: linear-gradient(135deg, var(--text-primary), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+
+  .hero-subtitle {
     font-family: 'Inter', sans-serif;
-    font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+    font-size: clamp(0.9rem, 1.5vw, 1.05rem);
     color: hsl(230, 15%, 60%);
-    text-align: center;
-    max-width: 600px;
-    margin: 0 auto 3rem;
+    margin: 0 0 1.25rem;
+    max-width: 55ch;
     line-height: 1.6;
   }
 
-  /* ── Section Divider ── */
+  .hero-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: hsl(230, 15%, 50%);
+  }
+
+  .hero-stat-dot {
+    color: hsla(270, 80%, 65%, 0.4);
+  }
+
   .section-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, hsla(270, 80%, 65%, 0.2), hsla(185, 85%, 55%, 0.15), transparent);
@@ -123,109 +177,247 @@ const comingSoon = [
     margin: 0 auto;
   }
 
-  /* ── Companies Grid ── */
-  .companies-grid {
+  .company-flow {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 1.5rem;
-  }
-
-  /* ── Coming Soon Grid ── */
-  .coming-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.25rem;
-  }
-
-  .coming-card {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    opacity: 0.6;
-    transition: opacity 0.3s ease, transform 0.25s ease, box-shadow 0.25s ease;
-    padding: 2rem 1.5rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .coming-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 8px,
-      hsla(230, 20%, 25%, 0.15) 8px,
-      hsla(230, 20%, 25%, 0.15) 16px
-    );
-    pointer-events: none;
-    opacity: 0.3;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    padding: 1.25rem;
+    background: hsla(230, 20%, 18%, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsla(230, 20%, 28%, 0.4);
     border-radius: 16px;
   }
 
-  .coming-card:hover {
-    opacity: 0.85;
+  .company-flow__step {
+    background: hsla(230, 20%, 15%, 0.45);
+    border: 1px solid hsla(230, 20%, 28%, 0.35);
+    border-radius: 14px;
+    padding: 1rem;
   }
 
-  .coming-card__badge {
-    position: relative;
-    z-index: 1;
+  .company-flow__index {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: hsl(270, 80%, 70%);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.06em;
   }
 
-  .coming-badge {
-    background: hsla(230, 20%, 30%, 0.5);
-    color: hsl(230, 15%, 55%);
-    border-color: hsla(230, 20%, 40%, 0.3);
-  }
-
-  .coming-card__name {
-    font-family: 'Outfit', sans-serif;
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: hsl(230, 15%, 55%);
-    margin: 0;
-    position: relative;
-    z-index: 1;
-  }
-
-  .coming-card__hint {
+  .company-flow__text,
+  .section-intro__text {
     font-family: 'Inter', sans-serif;
-    font-size: 0.8rem;
-    color: hsl(230, 15%, 45%);
-    line-height: 1.5;
+    font-size: 0.9rem;
+    color: hsl(230, 15%, 60%);
     margin: 0;
-    max-width: 28ch;
-    position: relative;
-    z-index: 1;
+    line-height: 1.6;
   }
 
-  .coming-card__link {
+  .section-intro {
+    margin-bottom: 1rem;
+  }
+
+  .section-intro__title {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+    color: var(--text-primary);
+  }
+
+  .company-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .company-block {
+    padding: 1.75rem 2rem;
+    background: hsla(230, 20%, 18%, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsla(230, 20%, 28%, 0.4);
+    border-radius: 16px;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  }
+
+  .company-block:hover {
+    border-color: hsla(270, 80%, 65%, 0.25);
+    box-shadow: 0 8px 32px hsla(270, 80%, 40%, 0.08);
+    transform: translateY(-1px);
+  }
+
+  .company-block__header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid hsla(230, 20%, 22%, 0.6);
+  }
+
+  .company-block__top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .company-block__name {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .company-block__readmore {
     font-family: 'Inter', sans-serif;
     font-size: 0.8rem;
     font-weight: 600;
-    color: hsl(270, 80%, 70%);
+    color: hsl(270, 80%, 65%);
     text-decoration: none;
-    margin-top: auto;
-    position: relative;
-    z-index: 1;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .company-block__readmore:hover {
+    color: hsl(185, 85%, 60%);
+  }
+
+  .company-block__summary {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    color: hsl(230, 15%, 60%);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 70ch;
+  }
+
+  .company-block__label-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .company-block__label-icon {
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+
+  .company-block__label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: hsl(230, 15%, 50%);
+    margin: 0;
+  }
+
+  .problem-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .problem-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    background: transparent;
+    transition: background 0.2s ease;
+  }
+
+  .problem-link:hover {
+    background: hsla(270, 80%, 65%, 0.06);
+  }
+
+  .problem-link__title {
+    flex: 1;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: hsl(0, 0%, 90%);
+    line-height: 1.4;
     transition: color 0.2s ease;
   }
 
-  .coming-card__link:hover {
-    color: hsl(185, 85%, 55%);
+  .problem-link:hover .problem-link__title {
+    color: hsl(270, 80%, 80%);
   }
 
-  /* ── Responsive ── */
+  .problem-link__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .problem-link__vertical {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    color: hsl(230, 15%, 48%);
+    background: hsla(230, 20%, 22%, 0.5);
+    padding: 0.2rem 0.55rem;
+    border-radius: 5px;
+    white-space: nowrap;
+    border: 1px solid hsla(230, 20%, 25%, 0.3);
+  }
+
+  .problem-link__score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: hsl(185, 85%, 55%);
+    background: hsla(185, 85%, 55%, 0.1);
+    padding: 0.2rem 0.45rem;
+    border-radius: 5px;
+    border: 1px solid hsla(185, 85%, 55%, 0.2);
+    min-width: 2rem;
+    text-align: center;
+  }
+
   @media (max-width: 768px) {
-    .companies-grid {
+    .company-flow {
       grid-template-columns: 1fr;
     }
 
-    .coming-grid {
-      grid-template-columns: 1fr;
+    .hero-section {
+      padding: 2.5rem 0 1rem;
+    }
+
+    .hero-orb {
+      width: 300px;
+      height: 300px;
+      top: -20%;
+    }
+
+    .company-block {
+      padding: 1.25rem 1rem;
+    }
+
+    .company-block__top {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .problem-link {
+      flex-wrap: wrap;
+    }
+
+    .problem-link__title {
+      flex: 1 1 100%;
+    }
+
+    .problem-link__meta {
+      margin-left: auto;
     }
   }
 </style>

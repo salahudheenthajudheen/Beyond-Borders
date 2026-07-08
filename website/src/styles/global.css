@@ -15,19 +15,19 @@
   --surface-glass-hover: hsl(0, 0%, 14%);
   --surface-glass-border: hsl(0, 0%, 20%);
 
-  --accent-purple: hsl(0, 0%, 90%);
-  --accent-violet: hsl(0, 0%, 80%);
-  --accent-cyan: hsl(0, 0%, 70%);
-  --accent-emerald: hsl(0, 0%, 60%);
+  --accent-purple: hsl(270, 80%, 65%);
+  --accent-violet: hsl(285, 75%, 55%);
+  --accent-cyan: hsl(185, 85%, 55%);
+  --accent-emerald: hsl(160, 70%, 45%);
 
   --text-primary: hsl(0, 0%, 95%);
-  --text-secondary: hsl(0, 0%, 65%);
-  --text-accent: hsl(0, 0%, 90%);
+  --text-secondary: hsl(230, 15%, 65%);
+  --text-accent: hsl(270, 80%, 75%);
 
-  --gradient-hero: none;
-  --gradient-accent: none;
-  --gradient-border: hsl(0, 0%, 25%);
-  --gradient-emerald: none;
+  --gradient-hero: linear-gradient(135deg, hsl(270, 80%, 20%), hsl(230, 25%, 7%), hsl(185, 50%, 15%));
+  --gradient-accent: linear-gradient(135deg, hsl(270, 80%, 65%), hsl(185, 85%, 55%));
+  --gradient-border: linear-gradient(135deg, hsl(270, 80%, 65%), hsl(185, 85%, 55%));
+  --gradient-emerald: linear-gradient(135deg, hsl(160, 70%, 45%), hsl(185, 85%, 55%));
 
   /* ---- Typography ---- */
   --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
@@ -80,8 +80,8 @@
   --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.2);
   --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.3);
-  --shadow-glow-purple: none;
-  --shadow-glow-cyan: none;
+  --shadow-glow-purple: 0 0 24px hsla(270, 80%, 65%, 0.25);
+  --shadow-glow-cyan: 0 0 24px hsla(185, 85%, 55%, 0.2);
 
   /* ---- Transitions ---- */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);

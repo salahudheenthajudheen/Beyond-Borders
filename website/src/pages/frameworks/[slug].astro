@@ -29,7 +29,7 @@ const iconMap: Record<string, string> = {
     <ol class="breadcrumb__list">
       <li class="breadcrumb__item"><a href={`${import.meta.env.BASE_URL}/`}>Home</a></li>
       <li class="breadcrumb__sep" aria-hidden="true">/</li>
-      <li class="breadcrumb__item"><a href={`${import.meta.env.BASE_URL}frameworks/`}>Frameworks</a></li>
+      <li class="breadcrumb__item"><a href={`${import.meta.env.BASE_URL}/frameworks/`}>Frameworks</a></li>
       <li class="breadcrumb__sep" aria-hidden="true">/</li>
       <li class="breadcrumb__item breadcrumb__item--active" aria-current="page">{framework.title}</li>
     </ol>
@@ -55,7 +55,7 @@ const iconMap: Record<string, string> = {
               {allFrameworks.map(fw => (
                 <li>
                   <a
-                    href={`${import.meta.env.BASE_URL}frameworks/${fw.slug}/`}
+                    href={`${import.meta.env.BASE_URL}/frameworks/${fw.slug}/`}
                     class:list={['fw-sidebar__link', { 'fw-sidebar__link--active': fw.slug === framework.slug }]}
                   >
                     <span class="fw-sidebar__icon">{iconMap[fw.slug] || '📄'}</span>
@@ -67,7 +67,7 @@ const iconMap: Record<string, string> = {
           </nav>
         </div>
 
-        <a href={`${import.meta.env.BASE_URL}frameworks/`} class="fw-sidebar__back">
+        <a href={`${import.meta.env.BASE_URL}/frameworks/`} class="fw-sidebar__back">
           ← Back to all frameworks
         </a>
       </aside>

@@ -1,227 +1,100 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/Hero.astro';
-import CompanyCard from '../components/CompanyCard.astro';
-import VerticalCard from '../components/VerticalCard.astro';
-import StatsCounter from '../components/StatsCounter.astro';
-import { getCompanies, getVerticals } from '../utils/content-loader';
+import { getCompanies, getCompanyDetail } from '../utils/content-loader';
 
 const companies = getCompanies();
-const verticals = getVerticals();
+const base = import.meta.env.BASE_URL;
 
+const companyDetails = companies.map(c => ({ company: c, detail: getCompanyDetail(c.slug) }));
 const totalUsecases = companies.reduce((sum, c) => sum + c.usecaseCount, 0);
-const totalProjects = companies.reduce((sum, c) => sum + c.projectCount, 0);
-
-const verticalIcons: Record<string, string> = {
-  'agriculture-ai': '🌾',
-  'healthcare-ai': '🏥',
-  'smart-manufacturing-ai': '🏭',
-  'manufacturing-ai': '🏭',
-  'maritime-ai': '🚢',
-  'tourism-ai': '🏛️',
-  'disaster-management-ai': '🌊',
-  'robotics-ai': '🤖',
-  'smart-campus-ai': '🎓',
-};
-
-const journeySteps = [
-  { emoji: '🔬', title: 'Technology', desc: 'Frontier tech from leading companies' },
-  { emoji: '🎯', title: 'Opportunity', desc: 'Real-world gaps waiting to be filled' },
-  { emoji: '💡', title: 'Use Case', desc: 'Validated problem statements with scores' },
-  { emoji: '🛠️', title: 'Project', desc: 'Open projects anyone can build' },
-  { emoji: '🧪', title: 'Prototype', desc: 'Working proof of concept' },
-  { emoji: '🚀', title: 'Startup', desc: 'Viable ventures ready to scale' },
-  { emoji: '🌍', title: 'Impact', desc: 'Measurable change in real lives' },
-];
 ---
 
-<BaseLayout title="Home" description="Beyond Borders — Open innovation intelligence by The Purple Movement. Discover opportunities, build solutions, create impact.">
+<BaseLayout title="Home" description="Beyond Borders — Open innovation intelligence by The Purple Movement.">
 
-  <!-- ═══ 1. Hero ═══ -->
-  <Hero
-    title="Discover Opportunities. Build Solutions. Create Impact."
-    subtitle="An open innovation intelligence repository mapping frontier technology to real-world problem statements — scored, structured, and ready to build."
-    showCta={true}
-  />
+  <section class="hero-section">
+    <div class="hero-orb" aria-hidden="true"></div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">Open Innovation Intelligence</div>
+        <h1 class="hero-title">Beyond Borders</h1>
+        <p class="hero-subtitle">A showcase of onboarded companies and the problem statements they have published — structured for builders, researchers, and collaborators.</p>
+        <div class="hero-stats">
+          <span class="hero-stat">{companies.length} Companies</span>
+          <span class="hero-stat-dot">·</span>
+          <span class="hero-stat">{totalUsecases} Problem Statements</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <!-- ═══ Section Divider ═══ -->
   <div class="section-divider"></div>
 
-  <!-- ═══ 2. Innovation Journey ═══ -->
-  <section class="section" id="journey">
+  <section class="section">
     <div class="container">
-      <h2 class="section-heading animate-fade-in-up">
-        The Innovation Journey
-      </h2>
-      <p class="section-subtitle animate-fade-in-up delay-1">
-        From frontier technology to real-world impact — a clear path for builders
-      </p>
+      <div class="flow-card glass-card">
+        <div class="flow-card__steps">
+          <div class="flow-step">
+            <span class="flow-step__index">1</span>
+            <h3 class="flow-step__title">Browse companies</h3>
+            <p class="flow-step__text">Review each company's profile and context.</p>
+          </div>
+          <div class="flow-step">
+            <span class="flow-step__index">2</span>
+            <h3 class="flow-step__title">Pick a problem</h3>
+            <p class="flow-step__text">Choose any problem statement below and view the full breakdown.</p>
+          </div>
+          <div class="flow-step">
+            <span class="flow-step__index">3</span>
+            <h3 class="flow-step__title">Build & contribute</h3>
+            <p class="flow-step__text">Use the details to build a project or submit an improvement.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      <div class="journey-track">
-        <div class="journey-line" aria-hidden="true"></div>
-        <div class="journey-scroll">
-          {journeySteps.map((step, i) => (
-            <div class={`journey-card animate-fade-in-up delay-${Math.min(i + 1, 6)}`}>
-              <span class="journey-card__icon">{step.emoji}</span>
-              <h3 class="journey-card__title">{step.title}</h3>
-              <p class="journey-card__desc">{step.desc}</p>
-              {i < journeySteps.length - 1 && (
-                <span class="journey-card__arrow" aria-hidden="true">→</span>
-              )}
+  <div class="section-divider"></div>
+
+  <section class="section">
+    <div class="container">
+      <div class="company-list">
+        {companyDetails.map(({ company, detail }) => (
+          <div class="company-block glass-card">
+            <div class="company-block__header">
+              <div class="company-block__top">
+                <h2 class="company-block__name">{company.name}</h2>
+                <a href={`${base}/companies/${company.slug}/`} class="company-block__readmore">
+                  Full profile →
+                </a>
+              </div>
+              <p class="company-block__summary">{company.summary}</p>
             </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ═══ Section Divider ═══ -->
-  <div class="section-divider"></div>
-
-  <!-- ═══ 3. Stats Counter ═══ -->
-  <section class="section" id="stats">
-    <div class="container">
-      <div class="animate-fade-in-up">
-        <StatsCounter stats={[
-          { label: 'Companies', value: companies.length },
-          { label: 'Problem Statements', value: totalUsecases },
-          { label: 'Verticals', value: verticals.length },
-          { label: 'Open Projects', value: totalProjects },
-        ]} />
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ Section Divider ═══ -->
-  <div class="section-divider"></div>
-
-  <!-- ═══ 4. Featured Companies ═══ -->
-  <section class="section" id="companies">
-    <div class="container">
-      <h2 class="section-heading animate-fade-in-up">
-        Frontier Companies
-      </h2>
-      <p class="section-subtitle animate-fade-in-up delay-1">
-        Handpicked companies whose technologies power the next wave of innovation
-      </p>
-
-      <div class="companies-grid">
-        {companies.map((company, i) => (
-          <div class={`animate-fade-in-up delay-${Math.min(i + 1, 6)}`}>
-            <CompanyCard
-              slug={company.slug}
-              name={company.name}
-              summary={company.summary}
-              usecaseCount={company.usecaseCount}
-              projectCount={company.projectCount}
-              verticals={company.verticals}
-            />
+            {detail && detail.usecases.length > 0 && (
+              <div class="company-block__problems">
+                <div class="company-block__label-row">
+                  <span class="company-block__label-icon">💡</span>
+                  <h3 class="company-block__label">Problem Statements</h3>
+                </div>
+                <div class="problem-list">
+                  {detail.usecases.map(uc => (
+                    uc.problems.map(ps => (
+                      <a href={`${base}/companies/${company.slug}/${uc.vertical}/${ps.slug}/`} class="problem-link">
+                        <span class="problem-link__title">{ps.title}</span>
+                        <span class="problem-link__meta">
+                          <span class="problem-link__vertical">{uc.vertical.replace(/-/g, ' ')}</span>
+                          {ps.scores.overall > 0 && (
+                            <span class="problem-link__score">{ps.scores.overall.toFixed(1)}</span>
+                          )}
+                        </span>
+                      </a>
+                    ))
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ Section Divider ═══ -->
-  <div class="section-divider"></div>
-
-  <!-- ═══ 5. Verticals Grid ═══ -->
-  <section class="section" id="verticals">
-    <div class="container">
-      <h2 class="section-heading animate-fade-in-up">
-        Technology Verticals
-      </h2>
-      <p class="section-subtitle animate-fade-in-up delay-1">
-        Where frontier technology meets real-world impact
-      </p>
-
-      <div class="verticals-grid">
-        {verticals.map((v, i) => (
-          <div class={`animate-fade-in-up delay-${Math.min(i + 1, 6)}`}>
-            <VerticalCard
-              slug={v.slug}
-              name={v.name}
-              usecaseCount={v.usecaseCount}
-              icon={verticalIcons[v.slug] || '🔬'}
-            />
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ Section Divider ═══ -->
-  <div class="section-divider"></div>
-
-  <!-- ═══ 6. How It Works ═══ -->
-  <section class="section" id="how-it-works">
-    <div class="container">
-      <h2 class="section-heading animate-fade-in-up">
-        How It Works
-      </h2>
-      <p class="section-subtitle animate-fade-in-up delay-1">
-        Three steps from curiosity to contribution
-      </p>
-
-      <div class="how-grid">
-        <div class="glass-card how-card animate-fade-in-up delay-1">
-          <span class="how-card__step">01</span>
-          <span class="how-card__icon">🔍</span>
-          <h3 class="how-card__title">Explore</h3>
-          <p class="how-card__desc">
-            Browse frontier companies and technology verticals. Discover where AI, robotics, and deep tech intersect with agriculture, healthcare, maritime, and more.
-          </p>
-        </div>
-
-        <div class="glass-card how-card animate-fade-in-up delay-2">
-          <span class="how-card__step">02</span>
-          <span class="how-card__icon">🎯</span>
-          <h3 class="how-card__title">Pick a Problem</h3>
-          <p class="how-card__desc">
-            Each use case is a scored problem statement with desirability, feasibility, and viability ratings. Find one that matches your skills and passion.
-          </p>
-        </div>
-
-        <div class="glass-card how-card animate-fade-in-up delay-3">
-          <span class="how-card__step">03</span>
-          <span class="how-card__icon">🚀</span>
-          <h3 class="how-card__title">Build & Submit</h3>
-          <p class="how-card__desc">
-            Create a project, prototype, or startup concept. Follow the templates, open a PR, and contribute to the world's open innovation intelligence.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ Section Divider ═══ -->
-  <div class="section-divider"></div>
-
-  <!-- ═══ 7. About Section ═══ -->
-  <section class="section" id="about">
-    <div class="container">
-      <div class="about-card glass-card animate-fade-in-up">
-        <div class="about-card__badge">
-          <span class="badge">The Purple Movement</span>
-        </div>
-        <h2 class="about-card__title">Our Mission</h2>
-        <p class="about-card__text">
-          Beyond Borders is an open innovation intelligence repository by <strong>The Purple Movement</strong>. We believe that the world's biggest problems deserve the world's best solutions — and that those solutions should be accessible to everyone.
-        </p>
-        <p class="about-card__text">
-          We map frontier technologies from companies like Google DeepMind, Waymo, and Verily to real-world problem statements across verticals like agriculture, healthcare, maritime, and disaster management. Every use case is scored for desirability, feasibility, and viability — so builders can focus on what matters most.
-        </p>
-        <p class="about-card__text">
-          This isn't just a repository. It's a launchpad. Students, researchers, entrepreneurs, and developers can pick a problem, build a project, and create measurable impact — all through open collaboration.
-        </p>
-        <div class="about-card__cta">
-          <a href="https://github.com/salahudheenthajudheen/Beyond-Borders" class="about-link" target="_blank" rel="noopener">
-            ⭐ Star on GitHub
-          </a>
-          <a href={`${import.meta.env.BASE_URL}contribute/`} class="about-link about-link--outline">
-            📖 Read the Contributing Guide
-          </a>
-        </div>
       </div>
     </div>
   </section>
@@ -229,28 +102,77 @@ const journeySteps = [
 </BaseLayout>
 
 <style>
-  /* ── Section Heading Styles ── */
-  .section-heading {
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    text-align: center;
-    margin-bottom: 0.75rem;
-    color: var(--text-primary);
-    line-height: 1.2;
+  .hero-section {
+    position: relative;
+    padding: 4rem 0 2.5rem;
+    overflow: hidden;
   }
 
-  .section-subtitle {
+  .hero-orb {
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, hsla(270, 80%, 50%, 0.12), transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: hsl(270, 80%, 70%);
+    background: hsla(270, 80%, 65%, 0.1);
+    border: 1px solid hsla(270, 80%, 65%, 0.2);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-family: var(--font-heading);
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    margin: 0 0 0.75rem;
+    background: linear-gradient(135deg, var(--text-primary), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+
+  .hero-subtitle {
     font-family: 'Inter', sans-serif;
-    font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
     color: hsl(230, 15%, 60%);
-    text-align: center;
-    max-width: 600px;
-    margin: 0 auto 3rem;
+    margin: 0 0 1.25rem;
+    max-width: 55ch;
     line-height: 1.6;
   }
 
-  /* ── Section Divider ── */
+  .hero-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: hsl(230, 15%, 50%);
+  }
+
+  .hero-stat-dot {
+    color: hsla(270, 80%, 65%, 0.4);
+  }
+
   .section-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, hsla(270, 80%, 65%, 0.2), hsla(185, 85%, 55%, 0.15), transparent);
@@ -258,282 +180,249 @@ const journeySteps = [
     margin: 0 auto;
   }
 
-  /* ── Innovation Journey ── */
-  .journey-track {
-    position: relative;
-    margin-top: 1rem;
-  }
-
-  .journey-line {
-    display: none;
-  }
-
-  .journey-scroll {
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-    padding: 1.5rem 0.5rem 1.5rem;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: hsla(270, 80%, 65%, 0.3) transparent;
-  }
-
-  .journey-scroll::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  .journey-scroll::-webkit-scrollbar-thumb {
-    background: hsla(270, 80%, 65%, 0.3);
-    border-radius: 4px;
-  }
-
-  .journey-card {
-    position: relative;
-    flex: 0 0 auto;
-    width: 155px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0.5rem;
-    padding: 1.5rem 1rem;
-    background: hsla(230, 20%, 20%, 0.6);
+  .flow-card {
+    padding: 1.5rem 1.75rem;
+    background: hsla(230, 20%, 18%, 0.6);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid hsla(230, 20%, 30%, 0.4);
+    border: 1px solid hsla(230, 20%, 28%, 0.4);
     border-radius: 16px;
-    scroll-snap-align: center;
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-    margin-right: 2.5rem;
   }
 
-  .journey-card:last-child {
-    margin-right: 0;
+  .flow-card__steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
   }
 
-  .journey-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 32px hsla(270, 80%, 40%, 0.15);
-    border-color: hsla(270, 80%, 65%, 0.3);
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
   }
 
-  .journey-card__icon {
-    font-size: 2rem;
-    line-height: 1;
+  .flow-step__index {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: hsl(270, 80%, 65%);
+    letter-spacing: 0.06em;
   }
 
-  .journey-card__title {
-    font-family: 'Outfit', sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: hsl(0, 0%, 95%);
+  .flow-step__title {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
     margin: 0;
+    color: var(--text-primary);
   }
 
-  .journey-card__desc {
+  .flow-step__text {
     font-family: 'Inter', sans-serif;
-    font-size: 0.72rem;
-    color: hsl(230, 15%, 60%);
+    font-size: 0.8rem;
+    color: hsl(230, 15%, 55%);
     line-height: 1.5;
     margin: 0;
   }
 
-  .journey-card__arrow {
-    position: absolute;
-    right: -1.7rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.2rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, hsl(270, 80%, 65%), hsl(185, 85%, 55%));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    pointer-events: none;
-  }
-
-  /* ── Companies Grid ── */
-  .companies-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  /* ── Company List ── */
+  .company-list {
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
   }
 
-  /* ── Verticals Grid ── */
-  .verticals-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1.25rem;
+  .company-block {
+    padding: 1.75rem 2rem;
+    background: hsla(230, 20%, 18%, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsla(230, 20%, 28%, 0.4);
+    border-radius: 16px;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
   }
 
-  /* ── How It Works ── */
-  .how-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+  .company-block:hover {
+    border-color: hsla(270, 80%, 65%, 0.25);
+    box-shadow: 0 8px 32px hsla(270, 80%, 40%, 0.08);
+    transform: translateY(-1px);
   }
 
-  .how-card {
-    text-align: center;
+  .company-block__header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid hsla(230, 20%, 22%, 0.6);
+  }
+
+  .company-block__top {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .how-card__step {
-    position: absolute;
-    top: 1rem;
-    right: 1.25rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: hsla(270, 80%, 65%, 0.4);
-    letter-spacing: 0.1em;
-  }
-
-  .how-card__icon {
-    font-size: 2.5rem;
-    line-height: 1;
-    margin-top: 0.5rem;
-  }
-
-  .how-card__title {
-    font-family: 'Outfit', sans-serif;
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: hsl(0, 0%, 95%);
-    margin: 0;
-  }
-
-  .how-card__desc {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.875rem;
-    color: hsl(230, 15%, 60%);
-    line-height: 1.65;
-    margin: 0;
-    max-width: 30ch;
-  }
-
-  /* ── About Section ── */
-  .about-card {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    align-items: baseline;
+    justify-content: space-between;
     gap: 1rem;
-    padding: 3rem 2.5rem;
-  }
-
-  .about-card__badge {
     margin-bottom: 0.5rem;
   }
 
-  .about-card__title {
+  .company-block__name {
     font-family: var(--font-heading);
+    font-size: 1.35rem;
     font-weight: 700;
-    font-size: clamp(1.5rem, 3vw, 2rem);
     margin: 0;
     color: var(--text-primary);
   }
 
-  .about-card__text {
+  .company-block__readmore {
     font-family: 'Inter', sans-serif;
-    font-size: 0.95rem;
-    color: hsl(230, 15%, 65%);
-    line-height: 1.75;
-    margin: 0;
-    max-width: 65ch;
-  }
-
-  .about-card__cta {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .about-link {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 500;
-    padding: 0.7rem 1.5rem;
-    border-radius: 8px;
-    background: var(--text-primary);
-    color: var(--bg-primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: hsl(270, 80%, 65%);
     text-decoration: none;
-    transition: transform 0.2s ease;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+    flex-shrink: 0;
   }
 
-  .about-link:hover {
-    transform: translateY(-2px);
-    background: hsl(0, 0%, 80%);
-    color: var(--bg-primary);
+  .company-block__readmore:hover {
+    color: hsl(185, 85%, 60%);
   }
 
-  .about-link--outline {
+  .company-block__summary {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    color: hsl(230, 15%, 60%);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 70ch;
+  }
+
+  /* ── Problem Statements ── */
+  .company-block__label-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .company-block__label-icon {
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+
+  .company-block__label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: hsl(230, 15%, 50%);
+    margin: 0;
+  }
+
+  .problem-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .problem-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
     background: transparent;
-    color: var(--text-primary);
-    border: 1px solid var(--surface-glass-border);
+    transition: background 0.2s ease;
   }
 
-  .about-link--outline:hover {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
+  .problem-link:hover {
+    background: hsla(270, 80%, 65%, 0.06);
   }
 
-  /* ── Responsive ── */
-  @media (max-width: 1024px) {
-    .how-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
+  .problem-link__title {
+    flex: 1;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: hsl(0, 0%, 90%);
+    line-height: 1.4;
+    transition: color 0.2s ease;
+  }
+
+  .problem-link:hover .problem-link__title {
+    color: hsl(270, 80%, 80%);
+  }
+
+  .problem-link__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .problem-link__vertical {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    color: hsl(230, 15%, 48%);
+    background: hsla(230, 20%, 22%, 0.5);
+    padding: 0.2rem 0.55rem;
+    border-radius: 5px;
+    white-space: nowrap;
+    border: 1px solid hsla(230, 20%, 25%, 0.3);
+  }
+
+  .problem-link__score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: hsl(185, 85%, 55%);
+    background: hsla(185, 85%, 55%, 0.1);
+    padding: 0.2rem 0.45rem;
+    border-radius: 5px;
+    border: 1px solid hsla(185, 85%, 55%, 0.2);
+    min-width: 2rem;
+    text-align: center;
   }
 
   @media (max-width: 768px) {
-    .companies-grid {
+    .hero-section {
+      padding: 2.5rem 0 1.5rem;
+    }
+
+    .flow-card {
+      padding: 1.25rem 1rem;
+    }
+
+    .flow-card__steps {
       grid-template-columns: 1fr;
     }
 
-    .verticals-grid {
-      grid-template-columns: repeat(2, 1fr);
+    .hero-orb {
+      width: 300px;
+      height: 300px;
+      top: -20%;
     }
 
-    .how-grid {
-      grid-template-columns: 1fr;
-      gap: 1rem;
+    .company-block {
+      padding: 1.25rem 1rem;
     }
 
-    .about-card {
-      padding: 2rem 1.5rem;
-    }
-
-    .journey-card {
-      width: 135px;
-      padding: 1.2rem 0.75rem;
-      margin-right: 1.25rem;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .verticals-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .about-card__cta {
+    .company-block__top {
       flex-direction: column;
-      align-items: center;
+      gap: 0.25rem;
     }
 
-    .about-link {
-      width: 100%;
-      max-width: 280px;
-      text-align: center;
+    .problem-link {
+      flex-wrap: wrap;
+    }
+
+    .problem-link__title {
+      flex: 1 1 100%;
+    }
+
+    .problem-link__meta {
+      margin-left: auto;
     }
   }
 </style>

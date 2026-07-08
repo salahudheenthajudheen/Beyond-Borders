@@ -46,7 +46,7 @@ function extractFirstParagraph(md: string): string {
           const meta = frameworkMeta[fw.slug] || { icon: '📄', label: fw.title };
           const desc = extractFirstParagraph(fw.content);
           return (
-            <a href={`${import.meta.env.BASE_URL}frameworks/${fw.slug}/`} class="fw-card glass-card gradient-border">
+            <a href={`${import.meta.env.BASE_URL}/frameworks/${fw.slug}/`} class="fw-card glass-card gradient-border">
               <span class="fw-card__icon">{meta.icon}</span>
               <div class="fw-card__badge">
                 <span class="badge">{meta.label}</span>
